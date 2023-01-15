@@ -29,6 +29,19 @@ Need for calibrations:
 git clone ssh://git@gitlab.cern.ch:7999/cms-nanoAOD/jsonpog-integration.git
 ```
 
+# Necessary step: producing efficiency maps
+Efficiency maps are necessary to create truth tagging, and to use b-tagging calibrations in the case of jets failing the b-tagging requirement. The maps need to be produced.
+```
+cd eff-maps
+python compute_efficiency_maps.py # need to modify line 26 where path = '' is defined to use the nanoaod samples
+python build_map.py
+```
+
+# Running the framework
+```
+cd hhh-analysis-framework
+python make_histograms_rdataframe_selection.py # see options
+```
 
 
 
