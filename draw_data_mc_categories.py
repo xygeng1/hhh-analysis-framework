@@ -1,9 +1,9 @@
-# Script to plot data / mc from processed files 
+# Script to plot data / mc from processed files
 
 import os, ROOT
-import tdrstyle,CMS_lumi
+#import tdrstyle,CMS_lumi
 
-from utils import labels, binnings
+from utils import labels, binnings, hist_properties
 
 ROOT.gROOT.SetBatch(ROOT.kTRUE)
 
@@ -15,22 +15,21 @@ ROOT.gROOT.SetBatch(ROOT.kTRUE)
 #CMS_lumi.extraText = "Internal"
 
 
-hist_properties = {'JetHT' : [ROOT.kBlack, 0.8, 0, 'Data', True] , # [color, marker size, line size, legend label , add in legend]
-                   'JetHT-btagSF' : [ROOT.kBlack, 0.8, 0, 'Data', True],
-                   'BTagCSV' : [ROOT.kBlack, 0.8, 0, 'Data', True],
-                   'QCD'   : [ROOT.kOrange, 0, 2, 'QCD', True], 
-                   'QCD6B'   : [ROOT.kOrange + 2, 0, 2, 'QCD6B', True], 
-                   'ZJetsToQQ'   : [ROOT.kCyan, 0, 2, 'V+jets', True], 
-                   'WJetsToQQ'   : [ROOT.kCyan, 0, 2, 'V+jets', False], 
-                   'ZZTo4Q' : [ROOT.kGray, 0, 2, 'VV', True], 
-                   'WWTo4Q' : [ROOT.kGray, 0, 2, 'VV', False], 
-                   'ZZZ' : [ROOT.kRed, 0, 2, 'VVV', True], 
-                   'WWW' : [ROOT.kRed, 0, 2, 'VVV', False], 
-                   'WZZ' : [ROOT.kRed, 0, 2, 'VVV', False], 
-                   'WWZ' : [ROOT.kRed, 0, 2, 'VVV', False], 
-                   'TT' : [ROOT.kBlue, 0,2, 't#bar{t}', True],
-                   'GluGluToHHHTo6B_SM' : [ROOT.kRed, 0,2, 'SM HHH x 10000', True],
-        } 
+from optparse import OptionParser
+parser = OptionParser()
+parser.add_option("--input_folder ", type="string", dest="input_folder", help="Folder in where to look for the categories", default='/eos/user/m/mstamenk/CxAOD31run/hhh-6b/v25/2017/baseline_recomputedSF/')
+parser.add_option("--output_folder ", type="string", dest="output_folder", help="Folder in where to look for the categories", default='none')
+(options, args) = parser.parse_args()
+
+input_folder=options.input_folder
+
+# change into one liner....
+output_folder=options.output_folder
+if output_folder == "none" :
+    output_folder = input_folder
+
+for era in [2016, 2017, 2018] :
+    if str(era) in input_folder : year = str(2017)
 
 
 #iPos = 11
@@ -43,30 +42,28 @@ p2 = ROOT.TPad("c_2","", 0,0.3,1,1)
 
 testname = 'HLT-fit-inputs-tt'
 year = '2016'
-datahist = 'JetHT'
-for year in ['2016APV','2016','2017','2018']:
+datahist = 'data_obs'
+if 1 > 0 : #for year in ['2016APV','2016','2017','2018']:
 #for year in ['2016']:
-    if '2018' not in year:
-        datahist = 'BTagCSV'
-    else:
-        datahist = 'JetHT'
-    for region in ['inclusive']:
-        for wp in ['loose']:
-            for tag in ['0ptag']:
-                
-                version = 'v24'
-                eos_plots = 'plots_data-mc-%s-%s-%s-%s-wp-%s-%s'%(testname,version,region,wp,tag,year)
+    #if '2018' not in year:
+    #    datahist = 'BTagCSV'
+    #else:
+    #    datahist = 'JetHT'
+    if 1 > 0 : #for region in ['inclusive']:
+        if 1 > 0 : #for wp in ['loose']:
+            if 1 > 0 : #for tag in ['0ptag']:
 
-                if not os.path.isdir(eos_plots):
-                    os.mkdir(eos_plots)
+                #version = 'v24'
+                #eos_plots = 'plots_data-mc-%s-%s-%s-%s-wp-%s-%s'%(testname,version,region,wp,tag,year)
 
-                #histo_path = '/isilon/data/users/mstamenk/eos-triple-h/bdt-test-2/%s/histograms-%s-%s-%s-%s-wp-%s-%s'%(version,testname,version,region,wp,tag,year)
-                histo_path = '/isilon/data/users/mstamenk/eos-triple-h/%s/histograms-%s-%s-%s-%s-wp-%s-%s'%(version,testname,version,region,wp,tag,year)
+                if not os.path.isdir(output_folder):
+                    os.mkdir(output_folder)
+
                 #histo_path = '/isilon/data/users/mstamenk/eos-triple-h/bdt-test-2/samples-%s-%s-%s-wp-%s-%s'%(version,region,wp,tag,year)
 
                 # ['JetHT','WWTo4Q','WWZ','ZJetsToQQ','ZZZ','QCD','WJetsToQQ','WWW','WZZ','ZZTo4Q', 'TT']:
 
-                file_data = ROOT.TFile(histo_path + '/' + 'histograms_%s.root'%(datahist))
+                file_data = ROOT.TFile(input_folder + '/' + 'histograms_%s.root'%(datahist))
                 #file_data = ROOT.TFile(histo_path + '/' + 'histograms_%s.root'%('GluGluToHHHTo6B_SM'))
 
                 #files_bkg = {}
@@ -84,16 +81,20 @@ for year in ['2016APV','2016','2017','2018']:
                 #variables.append('mva')
                 file_data.Close()
 
-                #for var in ['h1_mass_resolved', 'h2_mass_resolved', 'h3_mass_resolved', 'h1_pt_resolved','h2_pt_resolved', 'h3_pt_resolved', 'fatJet1Mass_boosted', 'fatJet2Mass_boosted', 'fatJet3Mass_boosted', 'fatJet1Pt_boosted', 'fatJet2Pt_boosted', 'fatJet3Pt_boosted', 'fatJet1PNetXbb_boosted', 'fatJet2PNetXbb_boosted', 'fatJet3PNetXbb_boosted']:
                 for var in variables:
+                    try :
+                        binining = binnings[var]
+                    except :
+                        print("Skip drawing %s, if you want to draw add the binning option in utils" % var)
+                        continue
                     print(var)
-                    file_data = ROOT.TFile(histo_path + '/' + 'histograms_%s.root'%(datahist))
-                    file_signal = ROOT.TFile(histo_path + '/' + 'histograms_%s.root'%('GluGluToHHHTo6B_SM'))
+                    file_data = ROOT.TFile(input_folder + '/' + 'histograms_%s.root'%(datahist))
+                    file_signal = ROOT.TFile(input_folder + '/' + 'histograms_%s.root'%('GluGluToHHHTo6B_SM'))
 
                     files_bkg = {}
                     for bkg in ['QCD','WWTo4Q','ZJetsToQQ','WJetsToQQ','WWW','WZZ','ZZTo4Q', 'WWTo4Q', 'TT']:
                     #for bkg in ['QCD6B']:
-                        f_tmp = ROOT.TFile(histo_path + '/' + 'histograms_%s.root'%bkg)
+                        f_tmp = ROOT.TFile(input_folder + '/' + 'histograms_%s.root'%bkg)
                         if f_tmp.IsOpen():
                             files_bkg[bkg] = f_tmp
 
@@ -111,7 +112,7 @@ for year in ['2016APV','2016','2017','2018']:
                     h_data.SetTitle('')
                     legend.AddEntry(h_data, hist_properties['JetHT'][3])
 
-                    # blinding 
+                    # blinding
                     if 'mass' in var:
                         for mass_value in [110,120,130]:
                             bin_m = h_data.FindBin(mass_value)
@@ -131,7 +132,7 @@ for year in ['2016APV','2016','2017','2018']:
                     h_signal.SetLineColor(hist_properties['GluGluToHHHTo6B_SM'][0])
                     h_signal.SetMarkerSize(hist_properties['GluGluToHHHTo6B_SM'][1])
                     h_signal.SetLineWidth(hist_properties['GluGluToHHHTo6B_SM'][2])
-                    h_signal.Scale(10000.)
+                    h_signal.Scale(100.)
                     legend.AddEntry(h_signal, hist_properties['GluGluToHHHTo6B_SM'][3], 'l')
 
                     h_stack = ROOT.THStack()
@@ -143,7 +144,7 @@ for year in ['2016APV','2016','2017','2018']:
                     #for bkg in ['QCD6B']:
                         f_bkg = files_bkg[bkg]
                         h_tmp = f_bkg.Get(var)
-                        binining = binnings[var]
+
                         try:
                             h_tmp.SetDirectory(0)
                         except: continue
@@ -158,7 +159,7 @@ for year in ['2016APV','2016','2017','2018']:
                             legend.AddEntry(h_tmp, hist_properties[bkg][3], 'f')
                         h_stack.Add(h_tmp)
 
-                       
+
                     maxi = max(h_data.GetMaximum(), h_bkg.GetMaximum())
 
                     h_data.SetMaximum(1.5*maxi)
@@ -220,11 +221,10 @@ for year in ['2016APV','2016','2017','2018']:
                     c.Update()
                     c.RedrawAxis()
 
-                    c.Print(eos_plots + '/' + var +  '.pdf')
+                    #c.Print(output_folder + '/' + var +  '.pdf') # save PDF only when we need to add to docs
+                    c.Print(output_folder + '/' + var +  '.png')
 
                     file_data.Close()
                     file_signal.Close()
                     for fi in files_bkg:
                         files_bkg[fi].Close()
-
-
