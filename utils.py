@@ -637,6 +637,27 @@ def add_bdt(df, year):
 
     return df
 
+computeMHHH = '''
+    float computeMHHH(float h1_t3_mass, float h1_t3_pt, float h1_t3_eta, float h1_t3_phi,float h2_t3_mass, float h2_t3_pt, float h2_t3_eta, float h2_t3_phi, float h3_t3_mass, float h3_t3_pt, float h3_t3_eta, float h3_t3_phi) {
+        TLorentzVector h1;
+        TLorentzVector h2;
+        TLorentzVector h3;
+
+        h1.SetPtEtaPhiM(h1_t3_pt, h1_t3_eta, h1_t3_phi, h1_t3_mass);
+        h2.SetPtEtaPhiM(h2_t3_pt, h2_t3_eta, h2_t3_phi, h2_t3_mass);
+        h3.SetPtEtaPhiM(h3_t3_pt, h3_t3_eta, h3_t3_phi, h3_t3_mass);
+
+        return (h1+h2+h3).M(); 
+    }
+
+'''
+
+def init_mhhh():
+    ROOT.gInterpreter.Declare(computeMHHH)
+
+def addMHHH(df):
+    df = df.Define('mHHH', 'computeMHHH(h1_t3_mass,h1_t3_pt,h1_t3_eta,h1_t3_phi,h2_t3_mass,h2_t3_pt,h2_t3_eta,h2_t3_phi,h3_t3_mass,h3_t3_pt,h3_t3_eta,h3_t3_phi)')
+    return df
 
 def drawText(x, y, text, color = ROOT.kBlack, fontsize = 0.05, font = 42, doNDC = True, alignment = 12):
     tex = ROOT.TLatex()

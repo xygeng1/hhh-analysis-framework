@@ -20,7 +20,7 @@ import gc
 
 ROOT.gROOT.SetBatch(ROOT.kTRUE)
 
-from utils import labels, wps_years, binnings, cuts, wps, tags, luminosities, hlt_paths, triggersCorrections, add_bdt, bdts_xml, hist_properties
+from utils import labels, wps_years, binnings, cuts, wps, tags, luminosities, hlt_paths, triggersCorrections, add_bdt, bdts_xml, hist_properties, init_mhhh, addMHHH
 
 from optparse import OptionParser
 parser = OptionParser()
@@ -49,6 +49,9 @@ selections = {
     "1PFfat"                        : "(nprobejets == 1)",
     "gt1PFfat"                      : "(nprobejets > 1)",
 }
+
+# define function to run on mHHH
+init_mhhh()
 
 inputTree = 'Events'
 
@@ -107,6 +110,9 @@ for selection in selections.keys() :
         print("With selection: ", selections[selection])
 
         chunk_df = ROOT.RDataFrame(inputTree, proc)
+
+        # add mHHH variable
+        chunk_df = addMHHH(chunk_df)
 
         entries_no_filter = int(chunk_df.Count().GetValue())
 
