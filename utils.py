@@ -31,313 +31,125 @@ hlt_paths = {
 
 
 
-labels = {
-          #'h1_mass' : 'm(H1)',
-          #'h2_mass' : 'm(H2)',
-          #'h3_mass' : 'm(H3)',
-
-          #'h1_pt' : 'p_{T}(H1)',
-          #'h2_pt' : 'p_{T}(H2)',
-          #'h3_pt' : 'p_{T}(H3)',
-
-          #'h1_eta' : '#eta(H1)',
-          #'h2_eta' : '#eta(H2)',
-          #'h3_eta' : '#eta(H3)',
-
-          #'h1_phi' : '#phi(H1)',
-          #'h2_phi' : '#phi(H2)',
-          #'h3_phi' : '#phi(H3)',
-
-          #'h1_t2_mass' : 'm(H1)',
-          #'h2_t2_mass' : 'm(H2)',
-          #'h3_t2_mass' : 'm(H3)',
-
-          'h1_t3_mass' : 'm(H1)',
-          'h2_t3_mass' : 'm(H2)',
-          'h3_t3_mass' : 'm(H3)',
-
-
-          'h_fit_mass' : 'm(H) fitted',
-
-          #'h1_t2_pt' : 'p_{T}(H1)',
-          #'h2_t2_pt' : 'p_{T}(H2)',
-          #'h3_t2_pt' : 'p_{T}(H3)',
-
-          #'h1_t2_eta' : '#eta(H1)',
-          #'h2_t2_eta' : '#eta(H2)',
-          #'h3_t2_eta' : '#eta(H3)',
-
-          #'h1_t2_phi' : '#phi(H1)',
-          #'h2_t2_phi' : '#phi(H2)',
-          #'h3_t2_phi' : '#phi(H3)',
-
-          #'h1_t2_match' : 'H1 truth matched',
-          #'h2_t2_match' : 'H2 truth matched',
-          #'h3_t2_match' : 'H3 truth matched',
-
-          #'h1_t2_dRjets' : '#Delta R(j1,j2) H1',
-          #'h2_t2_dRjets' : '#Delta R(j3,j4) H2',
-          #'h3_t2_dRjets' : '#Delta R(j5,j6) H3',
-
-          'h1_t3_pt' : 'p_{T}(H1)',
-          'h2_t3_pt' : 'p_{T}(H2)',
-          'h3_t3_pt' : 'p_{T}(H3)',
-
-          'h1_t3_eta' : '#eta(H1)',
-          'h2_t3_eta' : '#eta(H2)',
-          'h3_t3_eta' : '#eta(H3)',
-
-          'h1_t3_phi' : '#phi(H1)',
-          'h2_t3_phi' : '#phi(H2)',
-          'h3_t3_phi' : '#phi(H3)',
-
-          'h1_t3_dRjets' : '#Delta R(j1,j2) H1',
-          'h2_t3_dRjets' : '#Delta R(j3,j4) H2',
-          'h3_t3_dRjets' : '#Delta R(j5,j6) H3',
-
-          'h1_t3_match' : 'H1 truth matched',
-          'h2_t3_match' : 'H2 truth matched',
-          'h3_t3_match' : 'H3 truth matched',
-
-          #'h1_match' : 'H1 truth matched',
-          #'h2_match' : 'H2 truth matched',
-          #'h3_match' : 'H3 truth matched',
-
-          'bcand1Pt' : 'Jet 1 p_{T}',
-          'bcand2Pt' : 'Jet 2 p_{T}',
-          'bcand3Pt' : 'Jet 3 p_{T}',
-          'bcand4Pt' : 'Jet 4 p_{T}',
-          'bcand5Pt' : 'Jet 5 p_{T}',
-          'bcand6Pt' : 'Jet 6 p_{T}',
-
-          'bcand1Eta' : 'Jet 1 #eta',
-          'bcand2Eta' : 'Jet 2 #eta',
-          'bcand3Eta' : 'Jet 3 #eta',
-          'bcand4Eta' : 'Jet 4 #eta',
-          'bcand5Eta' : 'Jet 5 #eta',
-          'bcand6Eta' : 'Jet 6 #eta',
-
-          'bcand1Phi' : 'Jet 1 #phi',
-          'bcand2Phi' : 'Jet 2 #phi',
-          'bcand3Phi' : 'Jet 3 #phi',
-          'bcand4Phi' : 'Jet 4 #phi',
-          'bcand5Phi' : 'Jet 5 #phi',
-          'bcand6Phi' : 'Jet 6 #phi',
-
-          'bcand1DeepFlavB' : 'Jet 1 b-tag score',
-          'bcand2DeepFlavB' : 'Jet 2 b-tag score',
-          'bcand3DeepFlavB' : 'Jet 3 b-tag score',
-          'bcand4DeepFlavB' : 'Jet 4 b-tag score',
-          'bcand5DeepFlavB' : 'Jet 5 b-tag score',
-          'bcand6DeepFlavB' : 'Jet 6 b-tag score',
-
-          'bcand1HiggsMatched' : 'Jet 1 truth matched',
-          'bcand2HiggsMatched' : 'Jet 2 truth matched',
-          'bcand3HiggsMatched' : 'Jet 3 truth matched',
-          'bcand4HiggsMatched' : 'Jet 4 truth matched',
-          'bcand5HiggsMatched' : 'Jet 5 truth matched',
-          'bcand6HiggsMatched' : 'Jet 6 truth matched',
-
-          'fatJet1Mass' : 'm(H1)',
-          'fatJet2Mass' : 'm(H2)',
-          'fatJet3Mass' : 'm(H3)',
-
-          'fatJet1Pt' : 'p_{T}(H1)',
-          'fatJet2Pt' : 'p_{T}(H2)',
-          'fatJet3Pt' : 'p_{T}(H3)',
-
-          'fatJet1Eta' : '#eta(H1)',
-          'fatJet2Eta' : '#eta(H2)',
-          'fatJet3Eta' : '#eta(H3)',
-
-          'fatJet1Phi' : '#phi(H1)',
-          'fatJet2Phi' : '#phi(H2)',
-          'fatJet3Phi' : '#phi(H3)',
-
-          'fatJet1PNetXbb' : 'PNet Xbb(H1)',
-          'fatJet2PNetXbb' : 'PNet Xbb(H2)',
-          'fatJet3PNetXbb' : 'PNet Xbb(H3)',
-
-          'fatJet1PNetXjj' : 'PNet Xjj(H1)',
-          'fatJet2PNetXjj' : 'PNet Xjj(H2)',
-          'fatJet3PNetXjj' : 'PNet Xjj(H3)',
-
-          'fatJet1PNetQCD' : 'PNet QCD(H1)',
-          'fatJet2PNetQCD' : 'PNet QCD(H2)',
-          'fatJet3PNetQCD' : 'PNet QCD(H3)',
-
-          'hhh_resolved_mass': 'm(HHH)',
-          'hhh_resolved_pt': 'p_{T}(HHH)',
-          'hhh_t3_pt': 'p_{T}(HHH)',
-
-          'hhh_mass': 'm(HHH)',
-          'hhh_pt': 'p_{T}(HHH)',
-
-          'nfatjets' : 'N fat-jets',
-          'nprobejets' : 'N fat-jets',
-          'nbtags' : 'N b-tags',
-
-          'Nloosebtags' : 'N loose b-tags',
-          'Nmediumbtags' : 'N medium loose b-tags',
-          'Ntightbtags' : 'N tight b-tags',
-
-          'ht' : 'Event HT [GeV]',
-          #'tot' : 'Event HT [GeV]',
-          #'pass' : 'Event HT [GeV]',
-          'met' : 'E_{T}^{miss} [GeV]',
-          'bdt' : 'BDT output score',
-          'mva' : 'BDT output score',
-
-          'jet1DeepFlavB' : 'jet 1 DeepJet b-score',
-          'jet2DeepFlavB' : 'jet 2 DeepJet b-score',
-          'jet3DeepFlavB' : 'jet 3 DeepJet b-score',
-          'jet4DeepFlavB' : 'jet 4 DeepJet b-score',
-          'jet5DeepFlavB' : 'jet 5 DeepJet b-score',
-          'jet6DeepFlavB' : 'jet 6 DeepJet b-score',
-
-        }
-
-binnings = {
-          'h1_mass' : '(30,0,300)',
-          'h2_mass' : '(30,0,300)',
-          'h3_mass' : '(30,0,300)',
-
-          'h1_pt' : '(50,0,500)',
-          'h2_pt' : '(50,0,500)',
-          'h3_pt' : '(50,0,500)',
-
-          'h1_eta' : '(30,0,5)',
-          'h2_eta' : '(30,0,5)',
-          'h3_eta' : '(30,0,5)',
-
-          'h1_phi' : '(30,0,3.2)',
-          'h2_phi' : '(30,0,3.2)',
-          'h3_phi' : '(30,0,3.2)',
-
-          #'h1_match' : '(2,0,2)',
-          #'h2_match' : '(2,0,2)',
-          #'h3_match' : '(2,0,2)',
-
-          'h_fit_mass' : '(30,0,300)',
-
-          'h1_t3_dRjets' : '(40,0,4)',
-          'h2_t3_dRjets' : '(40,0,4)',
-          'h3_t3_dRjets' : '(40,0,4)',
-
-          'h1_t3_mass' : '(30,0,300)',
-          'h2_t3_mass' : '(30,0,300)',
-          'h3_t3_mass' : '(30,0,300)',
-
-          'h1_t3_pt' : '(50,0,500)',
-          'h2_t3_pt' : '(50,0,500)',
-          'h3_t3_pt' : '(50,0,500)',
-
-          'h1_t3_eta' : '(30,0,5)',
-          'h2_t3_eta' : '(30,0,5)',
-          'h3_t3_eta' : '(30,0,5)',
-
-          'h1_t3_phi' : '(30,0,3.2)',
-          'h2_t3_phi' : '(30,0,3.2)',
-          'h3_t3_phi' : '(30,0,3.2)',
-
-          #'h1_t3_match' : '(2,0,2)',
-          #'h2_t3_match' : '(2,0,2)',
-          #'h3_t3_match' : '(2,0,2)',
-
-          'fatJet1Mass' : '(30,0,300)',
-          'fatJet2Mass' : '(30,0,300)',
-          'fatJet3Mass' : '(30,0,300)',
-
-          'fatJet1Pt' : '(85,150,1000)',
-          'fatJet2Pt' : '(85,150,1000)',
-          'fatJet3Pt' : '(85,150,1000)',
-
-          'fatJet1Eta' : '(30,0,5)',
-          'fatJet2Eta' : '(30,0,5)',
-          'fatJet3Eta' : '(30,0,5)',
-
-          'fatJet1Phi' : '(30,0,3.2)',
-          'fatJet2Phi' : '(30,0,3.2)',
-          'fatJet3Phi' : '(30,0,3.2)',
-
-          'bcand1Pt' : '(85,0,500)',
-          'bcand2Pt' : '(85,0,500)',
-          'bcand3Pt' : '(85,0,500)',
-          'bcand4Pt' : '(85,0,500)',
-          'bcand5Pt' : '(85,0,500)',
-          'bcand6Pt' : '(85,0,500)',
-
-          'bcand1Eta' : '(30,0,5)',
-          'bcand2Eta' : '(30,0,5)',
-          'bcand3Eta' : '(30,0,5)',
-          'bcand4Eta' : '(30,0,5)',
-          'bcand5Eta' : '(30,0,5)',
-          'bcand6Eta' : '(30,0,5)',
-
-          #'bcand1Phi' : '(60,0,3.2)',
-          #'bcand2Phi' : '(60,0,3.2)',
-          #'bcand3Phi' : '(60,0,3.2)',
-          #'bcand4Phi' : '(60,0,3.2)',
-          #'bcand5Phi' : '(60,0,3.2)',
-          #'bcand6Phi' : '(60,0,3.2)',
-
-          #'bcand1DeepFlavB' : '(40,0,1)',
-          #'bcand2DeepFlavB' : '(40,0,1)',
-          #'bcand3DeepFlavB' : '(40,0,1)',
-          #'bcand4DeepFlavB' : '(40,0,1)',
-          #'bcand5DeepFlavB' : '(40,0,1)',
-          #'bcand6DeepFlavB' : '(40,0,1)',
-
-
-          #'bcand1HiggsMatched' : '(2,0,2)',
-          #'bcand2HiggsMatched' : '(2,0,2)',
-          #'bcand3HiggsMatched' : '(2,0,2)',
-          #'bcand4HiggsMatched' : '(2,0,2)',
-          #'bcand5HiggsMatched' : '(2,0,2)',
-          #'bcand6HiggsMatched' : '(2,0,2)',
-
-          'fatJet1PNetXbb' : '(20,0,1)',
-          'fatJet2PNetXbb' : '(20,0,1)',
-          'fatJet3PNetXbb' : '(20,0,1)',
-
-          'fatJet1PNetXjj' : '(20,0,1)',
-          'fatJet2PNetXjj' : '(20,0,1)',
-          'fatJet3PNetXjj' : '(20,0,1)',
-
-          'fatJet1PNetQCD' : '(20,0,1)',
-          'fatJet2PNetQCD' : '(20,0,1)',
-          'fatJet3PNetQCD' : '(20,0,1)',
-
-          'hhh_resolved_mass': '(80,0,1600)',
-          'hhh_resolved_pt': '(80,0,800)',
-          'hhh_t3_pt': '(80,0,800)',
-
-          'hhh_mass': '(155,400,3500)',
-          'hhh_pt': '(80,0,800)',
-
-          'nfatjets' : '(5,0,5)',
-          'nprobejets' : '(5,0,5)',
-          'nbtags' : '(10,0,10)',
-
-          'Nloosebtags' : '(10,0,10)',
-          'Nmediumbtags' : '(10,0,10)',
-          'Ntightbtags' : '(10,0,10)',
-
-          'ht' : '(200,0,2000)',
-          #'tot' : '(200,0,2000)',
-          #'pass' : '(200,0,2000)',
-          'met' : '(150,0,1500)',
-          'bdt' : '(20,-1,1)',
-          'mva' : '(20,-0.6,0.8)',
-
-          'jet1DeepFlavB' : '(20,0,1)',
-          'jet2DeepFlavB' : '(20,0,1)',
-          'jet3DeepFlavB' : '(20,0,1)',
-          'jet4DeepFlavB' : '(20,0,1)',
-          'jet5DeepFlavB' : '(20,0,1)',
-          'jet6DeepFlavB' : '(20,0,1)',
-
-        }
+histograms_dict = {
+        'h1_t3_mass'  : { "nbins" : 30 , "xmin" : 0 , "xmax" : 300, "label" : 'm(H1)'},
+        'h2_t3_mass'  : { "nbins" : 30 , "xmin" : 0 , "xmax" : 300, "label" : 'm(H2)'},
+        'h3_t3_mass'  : { "nbins" : 30 , "xmin" : 0 , "xmax" : 300, "label" : 'm(H3)'},
+
+        'h_fit_mass'  : { "nbins" : 30 , "xmin" : 0 , "xmax" : 300, "label" : 'm(H) fitted'},
+
+        'h1_t3_pt'  : { "nbins" : 50 , "xmin" : 0 , "xmax" : 500, "label" : 'p_{T}(H1)'},
+        'h2_t3_pt'  : { "nbins" : 50 , "xmin" : 0 , "xmax" : 500, "label" : 'p_{T}(H2)'},
+        'h3_t3_pt'  : { "nbins" : 50 , "xmin" : 0 , "xmax" : 500, "label" : 'p_{T}(H3)'},
+
+        'h1_t3_eta'  : { "nbins" : 30 , "xmin" : 0 , "xmax" : 5, "label" : '#eta(H1)'},
+        'h2_t3_eta'  : { "nbins" : 30 , "xmin" : 0 , "xmax" : 5, "label" : '#eta(H2)'},
+        'h3_t3_eta'  : { "nbins" : 30 , "xmin" : 0 , "xmax" : 5, "label" : '#eta(H3)'},
+
+        'h1_t3_phi'  : { "nbins" : 30 , "xmin" : 0 , "xmax" : 300, "label" : '#phi(H1)'},
+        'h2_t3_phi'  : { "nbins" : 30 , "xmin" : 0 , "xmax" : 300, "label" : '#phi(H2)'},
+        'h3_t3_phi'  : { "nbins" : 30 , "xmin" : 0 , "xmax" : 300, "label" : '#phi(H3)'},
+
+        'h1_t3_dRjets'  : { "nbins" : 30 , "xmin" : 0 , "xmax" : 3.2, "label" : '#Delta R(j1,j2) H1'},
+        'h2_t3_dRjets'  : { "nbins" : 30 , "xmin" : 0 , "xmax" : 3.2, "label" : '#Delta R(j3,j4) H2'},
+        'h3_t3_dRjets'  : { "nbins" : 30 , "xmin" : 0 , "xmax" : 3.2, "label" : '#Delta R(j5,j6) H3'},
+
+        'h1_t3_match'  : { "nbins" : 2 , "xmin" : 0 , "xmax" : 2, "label" : 'H1 truth matched'},
+        'h2_t3_match'  : { "nbins" : 2 , "xmin" : 0 , "xmax" : 2, "label" : 'H2 truth matched'},
+        'h3_t3_match'  : { "nbins" : 2 , "xmin" : 0 , "xmax" : 2, "label" : 'H3 truth matched'},
+
+        'bcand1Pt'  : { "nbins" : 85 , "xmin" : 0 , "xmax" : 500, "label" : 'Jet 1 p_{T}'},
+        'bcand2Pt'  : { "nbins" : 85 , "xmin" : 0 , "xmax" : 500, "label" : 'Jet 2 p_{T}'},
+        'bcand3Pt'  : { "nbins" : 85 , "xmin" : 0 , "xmax" : 500, "label" : 'Jet 3 p_{T}'},
+        'bcand4Pt'  : { "nbins" : 85 , "xmin" : 0 , "xmax" : 500, "label" : 'Jet 4 p_{T}'},
+        'bcand5Pt'  : { "nbins" : 85 , "xmin" : 0 , "xmax" : 500, "label" : 'Jet 5 p_{T}'},
+        'bcand6Pt'  : { "nbins" : 85 , "xmin" : 0 , "xmax" : 500, "label" : 'Jet 6 p_{T}'},
+
+        'bcand1Eta'  : { "nbins" : 30 , "xmin" : 0 , "xmax" : 5, "label" : 'Jet 1 #eta'},
+        'bcand2Eta'  : { "nbins" : 30 , "xmin" : 0 , "xmax" : 5, "label" : 'Jet 2 #eta'},
+        'bcand3Eta'  : { "nbins" : 30 , "xmin" : 0 , "xmax" : 5, "label" : 'Jet 3 #eta'},
+        'bcand4Eta'  : { "nbins" : 30 , "xmin" : 0 , "xmax" : 5, "label" : 'Jet 4 #eta'},
+        'bcand5Eta'  : { "nbins" : 30 , "xmin" : 0 , "xmax" : 5, "label" : 'Jet 5 #eta'},
+        'bcand6Eta'  : { "nbins" : 30 , "xmin" : 0 , "xmax" : 5, "label" : 'Jet 6 #eta'},
+
+        'bcand1Phi'  : { "nbins" : 60 , "xmin" : 0 , "xmax" : 3.2, "label" : 'Jet 1 #phi'},
+        'bcand2Phi'  : { "nbins" : 60 , "xmin" : 0 , "xmax" : 3.2, "label" : 'Jet 2 #phi'},
+        'bcand3Phi'  : { "nbins" : 60 , "xmin" : 0 , "xmax" : 3.2, "label" : 'Jet 3 #phi'},
+        'bcand4Phi'  : { "nbins" : 60 , "xmin" : 0 , "xmax" : 3.2, "label" : 'Jet 4 #phi'},
+        'bcand5Phi'  : { "nbins" : 60 , "xmin" : 0 , "xmax" : 3.2, "label" : 'Jet 5 #phi'},
+        'bcand6Phi'  : { "nbins" : 60 , "xmin" : 0 , "xmax" : 3.2, "label" : 'Jet 5 #phi'},
+
+        'bcand1DeepFlavB'  : { "nbins" : 40 , "xmin" : 0 , "xmax" : 1, "label" : 'Jet 1 b-tag score'},
+        'bcand2DeepFlavB'  : { "nbins" : 40 , "xmin" : 0 , "xmax" : 1, "label" : 'Jet 2 b-tag score'},
+        'bcand3DeepFlavB'  : { "nbins" : 40 , "xmin" : 0 , "xmax" : 1, "label" : 'Jet 3 b-tag score'},
+        'bcand4DeepFlavB'  : { "nbins" : 40 , "xmin" : 0 , "xmax" : 1, "label" : 'Jet 4 b-tag score'},
+        'bcand5DeepFlavB'  : { "nbins" : 40 , "xmin" : 0 , "xmax" : 1, "label" : 'Jet 5 b-tag score'},
+        'bcand6DeepFlavB'  : { "nbins" : 40 , "xmin" : 0 , "xmax" : 1, "label" : 'Jet 6 b-tag score'},
+
+        'bcand1HiggsMatched'  : { "nbins" : 2 , "xmin" : 0 , "xmax" : 2, "label" : 'Jet 1 truth matched'},
+        'bcand2HiggsMatched'  : { "nbins" : 2 , "xmin" : 0 , "xmax" : 2, "label" : 'Jet 2 truth matched'},
+        'bcand3HiggsMatched'  : { "nbins" : 2 , "xmin" : 0 , "xmax" : 2, "label" : 'Jet 3 truth matched'},
+        'bcand4HiggsMatched'  : { "nbins" : 2 , "xmin" : 0 , "xmax" : 2, "label" : 'Jet 4 truth matched'},
+        'bcand5HiggsMatched'  : { "nbins" : 2 , "xmin" : 0 , "xmax" : 2, "label" : 'Jet 5 truth matched'},
+        'bcand6HiggsMatched'  : { "nbins" : 2 , "xmin" : 0 , "xmax" : 2, "label" : 'Jet 6 truth matched'},
+
+        'fatJet1Mass'  : { "nbins" : 30 , "xmin" : 0 , "xmax" : 300, "label" : 'm(H1)'},
+        'fatJet2Mass'  : { "nbins" : 30 , "xmin" : 0 , "xmax" : 300, "label" : 'm(H2)'},
+        'fatJet3Mass'  : { "nbins" : 30 , "xmin" : 0 , "xmax" : 300, "label" : 'm(H3)'},
+
+        'fatJet1Pt'  : { "nbins" : 85 , "xmin" : 150 , "xmax" : 1000, "label" : 'p_{T}(H1)'},
+        'fatJet2Pt'  : { "nbins" : 85 , "xmin" : 150 , "xmax" : 1000, "label" : 'p_{T}(H2)'},
+        'fatJet3Pt'  : { "nbins" : 85 , "xmin" : 150 , "xmax" : 1000, "label" : 'p_{T}(H3)'},
+
+        'fatJet1Eta'  : { "nbins" : 30 , "xmin" : 0 , "xmax" : 5, "label" : '#eta(H1)'},
+        'fatJet2Eta'  : { "nbins" : 30 , "xmin" : 0 , "xmax" : 5, "label" : '#eta(H2)'},
+        'fatJet3Eta'  : { "nbins" : 30 , "xmin" : 0 , "xmax" : 5, "label" : '#eta(H3)'},
+
+        'fatJet1Phi'  : { "nbins" : 30 , "xmin" : 0 , "xmax" : 3.2, "label" : '#phi(H1)'},
+        'fatJet2Phi'  : { "nbins" : 30 , "xmin" : 0 , "xmax" : 3.2, "label" : '#phi(H2)'},
+        'fatJet3Phi'  : { "nbins" : 30 , "xmin" : 0 , "xmax" : 3.2, "label" : '#phi(H3)'},
+
+        'fatJet1PNetXbb'  : { "nbins" : 20 , "xmin" : 0 , "xmax" : 1, "label" : 'PNet Xbb(H1)'},
+        'fatJet2PNetXbb'  : { "nbins" : 20 , "xmin" : 0 , "xmax" : 1, "label" : 'PNet Xbb(H2)'},
+        'fatJet3PNetXbb'  : { "nbins" : 20 , "xmin" : 0 , "xmax" : 1, "label" : 'PNet Xbb(H3)'},
+
+        'fatJet1PNetXjj'  : { "nbins" : 20 , "xmin" : 0 , "xmax" : 1, "label" : 'PNet Xjj(H1)'},
+        'fatJet2PNetXjj'  : { "nbins" : 20 , "xmin" : 0 , "xmax" : 1, "label" : 'PNet Xjj(H2)'},
+        'fatJet3PNetXjj'  : { "nbins" : 20 , "xmin" : 0 , "xmax" : 1, "label" : 'PNet Xjj(H3)'},
+
+        'fatJet1PNetQCD'  : { "nbins" : 20 , "xmin" : 0 , "xmax" : 1, "label" : 'PNet QCD(H1)'},
+        'fatJet2PNetQCD'  : { "nbins" : 20 , "xmin" : 0 , "xmax" : 1, "label" : 'PNet QCD(H2)'},
+        'fatJet3PNetQCD'  : { "nbins" : 20 , "xmin" : 0 , "xmax" : 1, "label" : 'PNet QCD(H3)'},
+
+        'hhh_resolved_mass'  : { "nbins" : 80 , "xmin" : 0 , "xmax" : 1600, "label" : 'm(HHH)'},
+        'hhh_resolved_pt'  : { "nbins" : 80 , "xmin" : 0 , "xmax" : 800, "label" : 'p_{T}(HHH)'},
+        'hhh_t3_pt'  : { "nbins" : 80 , "xmin" : 0 , "xmax" : 800, "label" : 'p_{T}(HHH)'},
+
+        'hhh_mass'  : { "nbins" : 155 , "xmin" : 400 , "xmax" : 3500, "label" : 'm(HHH)'},
+        'hhh_pt'  : { "nbins" : 80 , "xmin" : 0 , "xmax" : 800, "label" : 'p_{T}(HHH)'},
+
+        'nfatjets'  : { "nbins" : 5 , "xmin" : 0 , "xmax" : 5, "label" : 'N fat-jets'},
+        'nprobejets'  : { "nbins" : 5 , "xmin" : 0 , "xmax" : 5, "label" : 'N fat-jets'},
+        'nbtags'  : { "nbins" : 10 , "xmin" : 0 , "xmax" : 10, "label" : 'N b-tags'},
+
+        'Nloosebtags'  : { "nbins" : 10 , "xmin" : 0 , "xmax" : 10, "label" : 'N loose b-tags'},
+        'Nmediumbtags'  : { "nbins" : 10 , "xmin" : 0 , "xmax" : 10, "label" : 'N meidum b-tags'},
+        'Ntightbtags'  : { "nbins" : 10 , "xmin" : 0 , "xmax" : 10, "label" : 'N tight b-tags'},
+
+        'ht'  : { "nbins" : 200 , "xmin" : 0 , "xmax" : 2000, "label" : 'Event HT [GeV]'},
+        'met'  : { "nbins" : 150 , "xmin" : 0 , "xmax" : 1500, "label" : 'E_{T}^{miss} [GeV]'},
+        'bdt'  : { "nbins" : 20 , "xmin" : -1 , "xmax" : 1, "label" : 'BDT output score'},
+        'mva'  : { "nbins" : 20 , "xmin" : -0.6 , "xmax" : 0.8, "label" : 'BDT output score'},
+
+        'jet1DeepFlavB'  : { "nbins" : 20 , "xmin" : 0 , "xmax" : 1, "label" : 'jet 1 DeepJet b-score'},
+        'jet2DeepFlavB'  : { "nbins" : 20 , "xmin" : 0 , "xmax" : 1, "label" : 'jet 2 DeepJet b-score'},
+        'jet3DeepFlavB'  : { "nbins" : 20 , "xmin" : 0 , "xmax" : 1, "label" : 'jet 3 DeepJet b-score'},
+        'jet4DeepFlavB'  : { "nbins" : 20 , "xmin" : 0 , "xmax" : 1, "label" : 'jet 4 DeepJet b-score'},
+        'jet5DeepFlavB'  : { "nbins" : 20 , "xmin" : 0 , "xmax" : 1, "label" : 'jet 5 DeepJet b-score'},
+        'jet6DeepFlavB'  : { "nbins" : 20 , "xmin" : 0 , "xmax" : 1, "label" : 'jet 6 DeepJet b-score'},
+
+
+}
 
 #cuts = {#'resolved' : ROOT.TCut('nbtags == 6 && nfatjets == 0 && nbtags > 4',
 #        #'boosted'  : 'nfatjets == 3 && nbtags > 4',
