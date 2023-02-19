@@ -178,7 +178,7 @@ labels = {
           'nbtags' : 'N b-tags',
 
           'Nloosebtags' : 'N loose b-tags',
-          'Nmediumbtags' : 'N medium loose b-tags',
+          'Nmediumbtags' : 'N medium b-tags',
           'Ntightbtags' : 'N tight b-tags',
 
           'ht' : 'Event HT [GeV]',
