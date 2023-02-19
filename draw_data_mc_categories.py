@@ -132,7 +132,7 @@ if 1 > 0 : #for year in ['2016APV','2016','2017','2018']:
                     h_signal.SetLineColor(hist_properties['GluGluToHHHTo6B_SM'][0])
                     h_signal.SetMarkerSize(hist_properties['GluGluToHHHTo6B_SM'][1])
                     h_signal.SetLineWidth(hist_properties['GluGluToHHHTo6B_SM'][2])
-                    h_signal.Scale(100.)
+                    h_signal.Scale(100000.)
                     legend.AddEntry(h_signal, hist_properties['GluGluToHHHTo6B_SM'][3], 'l')
 
                     h_stack = ROOT.THStack()
@@ -217,9 +217,12 @@ if 1 > 0 : #for year in ['2016APV','2016','2017','2018']:
                     p1.SetGridy()
                     h_div.Draw('e')
                     h_mc_stat.Draw('e2 same')
-                    c.cd()
+                    gPad = c.cd()
+
+
                     c.Update()
                     c.RedrawAxis()
+                    gPad.SetLogy()
 
                     #c.Print(output_folder + '/' + var +  '.pdf') # save PDF only when we need to add to docs
                     c.Print(output_folder + '/' + var +  '.png')
