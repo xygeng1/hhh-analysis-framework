@@ -29,7 +29,7 @@ if output_folder == "none" :
     output_folder = input_folder
 
 for era in [2016, 2017, 2018] :
-    if str(era) in input_folder : year = str(2017)
+    if str(era) in input_folder : year = str(era)
 
 
 #iPos = 11
