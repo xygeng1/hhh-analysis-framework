@@ -26,12 +26,12 @@ from optparse import OptionParser
 parser = OptionParser()
 parser.add_option("--base_folder ", type="string", dest="base", help="Folder in where to look for the categories", default='/eos/user/m/mstamenk/CxAOD31run/hhh-6b/v25/2017/baseline_recomputedSF/')
 parser.add_option("--category ", type="string", dest="category", help="Category to compute it. if no argument is given will do all", default='none')
-## separate SR_CR
+## separate SR_CR as an option, this option would add _SR and _CR to the subfolder name
 ## skip do trees
 ## add option to add BDT computation here -- or not, we leave this only to MVA input variables -- the prefit plots already do data/MC
 (options, args) = parser.parse_args()
 
-skip_do_trees      = True
+skip_do_trees      = False
 skip_do_histograms = False
 input_tree         = options.base
 cat                = options.category
@@ -48,6 +48,7 @@ selections = {
     "gt5bmedium_0PFfat"             : "(Nmediumbtags > 5 && nprobejets == 0)",
     "1PFfat"                        : "(nprobejets == 1)",
     "gt1PFfat"                      : "(nprobejets > 1)",
+    "gt0PFfat"                      : "(nprobejets > 1)",
 }
 
 # define function to run on mHHH
@@ -159,6 +160,11 @@ for selection in selections.keys() :
             except:
                 1 == 1
 
+        for hhhvar in ['hhh_resolved_mass', 'hhh_resolved_pt', 'hhh_t3_pt', 'hhh_mass', 'hhh_pt', "hh_eta", "hh_mass", "hh_phi", "hh_pt", "hhh_eta", "hhh_phi",] :
+            #print("removed %s" % hhhvar)
+            variables.remove(hhhvar)
+
+        # those above are not what we think they are
         for hhhvar in [ 'eta_MassRegressed', 'phi_MassRegressed', 'mass_MassRegressed'] :
             variables.remove('hhh_{}'.format(hhhvar))
             variables.remove('hh_{}'.format(hhhvar))
@@ -277,6 +283,9 @@ for selection in selections.keys() :
 
     histograms = []
     variables = chunk_df.GetColumnNames()
+    if not len(variables) > 0 :
+        print("process %s has 0 entries, skipping doing the histogram" % proctodo)
+        continue
     #print(labels.keys())
     #variables = [v for v in labels if 'h_fit_mass' not in v and 'match' not in v and 'Match' not in v] # can be done better
     print("Will produce histograms for following variables:")

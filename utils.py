@@ -166,14 +166,18 @@ labels = {
           'fatJet2PNetQCD' : 'PNet QCD(H2)',
           'fatJet3PNetQCD' : 'PNet QCD(H3)',
 
-          'hhh_resolved_mass': 'm(HHH)',
-          'hhh_resolved_pt': 'p_{T}(HHH)',
-          'hhh_t3_pt': 'p_{T}(HHH)',
+          'HHH_mass' : 'm(HHH)',
+          'HHH_pt': 'p_{T}(HHH)',
+          'HHH_eta': 'eta_{T}(HHH)',
 
-          'hhh_mass': 'm(HHH)',
-          'hhh_pt': 'p_{T}(HHH)',
+          #'hhh_resolved_mass': 'm(HHH)',
+          #'hhh_resolved_pt': 'p_{T}(HHH)',
+          #'hhh_t3_pt': 'p_{T}(HHH)',
 
-          'nfatjets' : 'N fat-jets',
+          #'hhh_mass': 'm(HHH)',
+          #'hhh_pt': 'p_{T}(HHH)',
+
+          #'nfatjets' : 'N fat-jets',
           'nprobejets' : 'N fat-jets',
           'nbtags' : 'N b-tags',
 
@@ -308,14 +312,18 @@ binnings = {
           'fatJet2PNetQCD' : '(20,0,1)',
           'fatJet3PNetQCD' : '(20,0,1)',
 
-          'hhh_resolved_mass': '(80,0,1600)',
-          'hhh_resolved_pt': '(80,0,800)',
-          'hhh_t3_pt': '(80,0,800)',
+          'HHH_mass' : '(80,0,1600)',
+          'HHH_pt': '(80,0,800)',
+          'HHH_eta': '(30,0,5)',
 
-          'hhh_mass': '(155,400,3500)',
-          'hhh_pt': '(80,0,800)',
+          #'hhh_resolved_mass': '(80,0,1600)',
+          #'hhh_resolved_pt': '(80,0,800)',
+          #'hhh_t3_pt': '(80,0,800)',
 
-          'nfatjets' : '(5,0,5)',
+          #'hhh_mass': '(155,400,3500)',
+          #'hhh_pt': '(80,0,800)',
+
+          #'nfatjets' : '(5,0,5)',
           'nprobejets' : '(5,0,5)',
           'nbtags' : '(10,0,10)',
 
@@ -637,8 +645,9 @@ def add_bdt(df, year):
 
     return df
 
+# try to do this smarther == no triplicate computations
 computeMHHH = '''
-    float computeMHHH(float h1_t3_mass, float h1_t3_pt, float h1_t3_eta, float h1_t3_phi,float h2_t3_mass, float h2_t3_pt, float h2_t3_eta, float h2_t3_phi, float h3_t3_mass, float h3_t3_pt, float h3_t3_eta, float h3_t3_phi) {
+    float computeMHHH(int type, float h1_t3_mass, float h1_t3_pt, float h1_t3_eta, float h1_t3_phi,float h2_t3_mass, float h2_t3_pt, float h2_t3_eta, float h2_t3_phi, float h3_t3_mass, float h3_t3_pt, float h3_t3_eta, float h3_t3_phi) {
         TLorentzVector h1;
         TLorentzVector h2;
         TLorentzVector h3;
@@ -647,7 +656,14 @@ computeMHHH = '''
         h2.SetPtEtaPhiM(h2_t3_pt, h2_t3_eta, h2_t3_phi, h2_t3_mass);
         h3.SetPtEtaPhiM(h3_t3_pt, h3_t3_eta, h3_t3_phi, h3_t3_mass);
 
-        return (h1+h2+h3).M(); 
+
+        if (type == 0)
+            return (h1+h2+h3).M();
+        else if (type == 1)
+            return (h1+h2+h3).Pt();
+        else if (type == 2)
+            return (h1+h2+h3).Eta();
+        else return 0;
     }
 
 '''
@@ -656,7 +672,9 @@ def init_mhhh():
     ROOT.gInterpreter.Declare(computeMHHH)
 
 def addMHHH(df):
-    df = df.Define('mHHH', 'computeMHHH(h1_t3_mass,h1_t3_pt,h1_t3_eta,h1_t3_phi,h2_t3_mass,h2_t3_pt,h2_t3_eta,h2_t3_phi,h3_t3_mass,h3_t3_pt,h3_t3_eta,h3_t3_phi)')
+    df = df.Define('HHH_mass', 'computeMHHH(0, h1_t3_mass,h1_t3_pt,h1_t3_eta,h1_t3_phi,h2_t3_mass,h2_t3_pt,h2_t3_eta,h2_t3_phi,h3_t3_mass,h3_t3_pt,h3_t3_eta,h3_t3_phi)')
+    df = df.Define('HHH_pt', 'computeMHHH(1, h1_t3_mass,h1_t3_pt,h1_t3_eta,h1_t3_phi,h2_t3_mass,h2_t3_pt,h2_t3_eta,h2_t3_phi,h3_t3_mass,h3_t3_pt,h3_t3_eta,h3_t3_phi)')
+    df = df.Define('HHH_eta', 'computeMHHH(2, h1_t3_mass,h1_t3_pt,h1_t3_eta,h1_t3_phi,h2_t3_mass,h2_t3_pt,h2_t3_eta,h2_t3_phi,h3_t3_mass,h3_t3_pt,h3_t3_eta,h3_t3_phi)')
     return df
 
 def drawText(x, y, text, color = ROOT.kBlack, fontsize = 0.05, font = 42, doNDC = True, alignment = 12):
