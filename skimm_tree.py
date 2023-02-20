@@ -29,16 +29,26 @@ parser.add_option("--category ", type="string", dest="category", help="Category 
 parser.add_option("--skip_do_trees", action="store_true", dest="skip_do_trees", help="Write...", default=False)
 parser.add_option("--skip_do_histograms", action="store_true", dest="skip_do_histograms", help="Write...", default=False)
 parser.add_option("--skip_do_plots", action="store_true", dest="skip_do_plots", help="Write...", default=False)
+parser.add_option("--do_SR", action="store_true", dest="do_SR", help="Write...", default=False)
+parser.add_option("--do_CR", action="store_true", dest="do_CR", help="Write...", default=False)
+parser.add_option("--process ", type="string", dest="process_to_compute", help="Process to compute it. if no argument is given will do all", default='none')
 ## separate SR_CR as an option, this option would add _SR and _CR to the subfolder name
 ## add option to enter a process and if that is given to make the trees and histos only to it
 ## add option to add BDT computation here -- or not, we leave this only to MVA input variables -- the prefit plots already do data/MC
 (options, args) = parser.parse_args()
 
+process_to_compute = options.process_to_compute
+do_SR              = options.do_SR
+do_CR              = options.do_CR
 skip_do_trees      = options.skip_do_trees
 skip_do_histograms = options.skip_do_histograms
-skip_do_plots = options.skip_do_plots
+skip_do_plots      = options.skip_do_plots
 input_tree         = options.base
 cat                = options.category
+
+if do_SR and do_CR :
+    print("You should chose to signal region OR control region")
+    exit()
 
 selections = {
     #"final_selection_jetMultiplicity" : "(nbtags > 4 && nfatjets == 0) || (nbtags > 2 && nfatjets > 0)",
@@ -55,16 +65,24 @@ selections = {
     "gt0PFfat"                      : "(nprobejets > 1)",
 }
 
+additional_selection = ""
+additional_label     = ""
+if do_SR :
+    additional_selection = " && (h_fit_mass > 80 && h_fit_mass < 150)"
+    additional_label     = "_SR"
+if do_CR :
+    additional_selection = " && !(h_fit_mass > 80 && h_fit_mass < 150)"
+    additional_label     = "_CR"
+
 # define function to run on mHHH
 init_mhhh()
 
 inputTree = 'Events'
 
 procstodo = ["ZZZ", "WZZ", "WWZ", "WWW", "ZZTo4Q", "WWTo4Q", "ZJetsToQQ", "WJetsToQQ", "TT", "QCD", "QCD6B", "data_obs" , "GluGluToHHHTo6B_SM"]
-#procstodo = [  "QCD6B", "data_obs" ]
-#procstodo = [ "WWZ" ]
-
-
+if not process_to_compute == 'none' :
+    procstodo     = [process_to_compute]
+    skip_do_plots = True
 
 for era in [2016, 2017, 2018] :
     if str(era) in input_tree : year = str(era)
@@ -78,9 +96,15 @@ for selection in selections.keys() :
   if not cat == 'none' :
       if not selection == cat :
           continue
-  print("Doing tree skimmed for %s" % selection)
-  print(selections[selection])
-  output_folder = "{}/{}".format(input_tree,selection)
+
+
+  final_selection = selections[selection]
+  if not additional_selection == "" :
+      final_selection = "(%s %s)" % (selections[selection], additional_selection)
+
+  print("Doing tree skimmed for %s%s" % (selection, additional_label))
+  print(final_selection)
+  output_folder = "{}/{}{}".format(input_tree,selection,additional_label)
   if not path.exists(output_folder) :
       procs=subprocess.Popen(['mkdir %s' % output_folder],shell=True,stdout=subprocess.PIPE)
       out = procs.stdout.read()
@@ -97,7 +121,7 @@ for selection in selections.keys() :
         else:
             datahist = 'BTagCSV'
 
-    outtree = "{}/{}/{}.root".format(input_tree,selection,proctodo)
+    outtree = "{}/{}{}/{}.root".format(input_tree,selection,additional_label,proctodo)
 
     list_proc=glob.glob("{}/inclusive/{}.root".format(input_tree,datahist))
     print("Will create %s" % outtree)
@@ -110,7 +134,7 @@ for selection in selections.keys() :
         seconds0 = time.time()
         print(proc)
         print("Cutting tree and saving it to ", outtree)
-        print("With selection: ", selections[selection])
+        print("With selection: ", final_selection)
 
         chunk_df = ROOT.RDataFrame(inputTree, proc)
 
@@ -136,7 +160,7 @@ for selection in selections.keys() :
         chunk_df = chunk_df.Define('Nmediumbtags',nmedium)
         chunk_df = chunk_df.Define('Ntightbtags',ntight)
 
-        chunk_df = chunk_df.Filter(selections[selection])
+        chunk_df = chunk_df.Filter(final_selection)
         entries = int(chunk_df.Count().GetValue())
 
         #print("cut made, tree size: ", int(tree.GetEntries()), int(tree_cut.GetEntries()))
@@ -204,9 +228,7 @@ for selection in selections.keys() :
         ## cleaning is not working for all variables, even if explicitelly asking to remove all that name, and for some not cleaned variables will given
         ## Error in <TBranch::TBranch>: Illegal leaf: LHEReweightingWeight/LHEReweightingWeight[nLHEReweightingWeight]/F. If this is a variable size C array it's possible that the branch holding the size is not available
         ## Maybe because I do not source CMSSW
-        ## we are bellow hardcoding list of variables to save
 
-        #variables = {'HHH_eta', 'HHH_mass', 'HHH_pt', 'HLT_AK8PFJet15', 'HLT_AK8PFJet25', 'HLT_AK8PFJet330_TrimMass30_PFAK8BTagDeepCSV_p17', 'HLT_AK8PFJet330_TrimMass30_PFAK8BoostedDoubleB_np4', 'HLT_AK8PFJet360_TrimMass30', 'HLT_AK8PFJet40', 'HLT_AK8PFJet400_TrimMass30', 'HLT_AK8PFJet450', 'HLT_AK8PFJet550', 'HLT_AK8PFJet80', 'HLT_AK8PFJetFwd15', 'HLT_AK8PFJetFwd25', 'HLT_AK8PFJetFwd320', 'HLT_AK8PFJetFwd400', 'HLT_AK8PFJetFwd500', 'HLT_AK8PFJetFwd80', 'HLT_Ele32_WPTight_Gsf', 'HLT_Ele35_WPTight_Gsf', 'HLT_Ele40_WPTight_Gsf', 'HLT_IsoMu24', 'HLT_IsoMu27', 'HLT_Mu50', 'HLT_PFHT1050', 'HLT_PFHT250', 'HLT_PFHT330PT30_QuadPFJet_75_60_45_40_TriplePFBTagDeepCSV_4p5', 'HLT_PFHT350MinPFJet15', 'HLT_PFHT400_SixPFJet32', 'HLT_PFHT450_SixPFJet36_PFBTagDeepCSV_1p59', 'HLT_PFJet200', 'HLT_PFJetFwd15', 'HLT_PFJetFwd25', 'HLT_PFMET110_PFMHT110_IDTight_CaloBTagDeepCSV_3p1', 'HLT_PFMET120_PFMHT120_IDTight_CaloBTagDeepCSV_3p1', 'HLT_QuadPFJet103_88_75_15_DoublePFBTagDeepCSV_1p3_7p7_VBF1', 'HLT_QuadPFJet105_88_76_15_PFBTagDeepCSV_1p3_VBF2', 'HLT_QuadPFJet111_90_80_15_DoublePFBTagDeepCSV_1p3_7p7_VBF1', 'HLT_QuadPFJet98_83_71_15_PFBTagDeepCSV_1p3_VBF2', 'L1_HTT280er', 'L1_HTT320er', 'L1_HTT320er_QuadJet_80_60_er2p1_45_40_er2p3', 'L1_HTT360er', 'Nloosebtags', 'Nmediumbtags', 'Ntightbtags', 'bcand1Eta', 'bcand1Mass', 'bcand1Phi', 'bcand1Pt', 'bcand2Eta', 'bcand2Mass', 'bcand2Phi', 'bcand2Pt', 'bcand3Eta', 'bcand3Mass', 'bcand3Phi', 'bcand3Pt', 'bcand4Eta', 'bcand4Mass', 'bcand4Phi', 'bcand4Pt', 'bcand5Eta', 'bcand5Mass', 'bcand5Phi', 'bcand5Pt', 'bcand6Eta', 'bcand6Mass', 'bcand6Phi', 'bcand6Pt', 'bdt', 'deltaEta_j1j2', 'deltaPhi_j1j2', 'deltaR_j1j2', 'event', 'fatJet1Eta', 'fatJet1HasBJetCSVMedium', 'fatJet1HasBJetCSVTight', 'fatJet1Mass', 'fatJet1PNetQCD', 'fatJet1PNetXbb', 'fatJet1PNetXjj', 'fatJet1Phi', 'fatJet1Pt', 'fatJet2Eta', 'fatJet2HasBJetCSVMedium', 'fatJet2HasBJetCSVTight', 'fatJet2Mass', 'fatJet2PNetQCD', 'fatJet2PNetXbb', 'fatJet2PNetXjj', 'fatJet2Phi', 'fatJet2Pt', 'fatJet3Eta', 'fatJet3HasBJetCSVMedium', 'fatJet3HasBJetCSVTight', 'fatJet3Mass', 'fatJet3PNetQCD', 'fatJet3PNetXbb', 'fatJet3PNetXjj', 'fatJet3Phi', 'fatJet3Pt', 'h1_t3_dRjets', 'h1_t3_eta', 'h1_t3_mass', 'h1_t3_phi', 'h1_t3_pt', 'h2_t3_dRjets', 'h2_t3_eta', 'h2_t3_mass', 'h2_t3_phi', 'h2_t3_pt', 'h3_t3_dRjets', 'h3_t3_eta', 'h3_t3_mass', 'h3_t3_phi', 'h3_t3_pt', 'h_fit_mass', 'ht', 'jet10Eta', 'jet10Mass', 'jet10Phi', 'jet10Pt', 'jet1Eta', 'jet1Mass', 'jet1Phi', 'jet1Pt', 'jet2Eta', 'jet2Mass', 'jet2Phi', 'jet2Pt', 'jet3Eta', 'jet3Mass', 'jet3Phi', 'jet3Pt', 'jet4Eta', 'jet4Mass', 'jet4Phi', 'jet4Pt', 'jet5Eta', 'jet5Mass', 'jet5Phi', 'jet5Pt', 'jet6Eta', 'jet6Mass', 'jet6Phi', 'jet6Pt', 'jet7Eta', 'jet7Mass', 'jet7Phi', 'jet7Pt', 'jet8Eta', 'jet8Mass', 'jet8Phi', 'jet8Pt', 'jet9Eta', 'jet9Mass', 'jet9Phi', 'jet9Pt', 'luminosityBlock', 'max_bcand_eta', 'max_h_dRjets', 'max_h_eta', 'met', 'metphi', 'min_bcand_eta', 'min_h_dRjets', 'min_h_eta', 'nprobejets', 'run'}
         ## symetrize angle variables
         for type_obj in ['bcand', 'fatJet', 'jet'] :
             for jet_number in range(1,11) :
@@ -275,9 +297,9 @@ for selection in selections.keys() :
             datahist = 'BTagCSV'
 
 
-    outtree = "{}/{}/{}.root".format(input_tree,selection,proctodo) ## make better, to not have to call it twice
+    outtree = "{}/{}{}/{}.root".format(input_tree,selection,additional_label,proctodo) ## make better, to not have to call it twice
     ## do Histograms
-    output_histos = "{}/{}/histograms".format(input_tree,selection)
+    output_histos = "{}/{}{}/histograms".format(input_tree,selection,additional_label)
 
     if not path.exists(output_histos) :
       procs=subprocess.Popen(['mkdir %s' % output_histos],shell=True,stdout=subprocess.PIPE)
