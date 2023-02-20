@@ -20,7 +20,7 @@ import gc
 
 ROOT.gROOT.SetBatch(ROOT.kTRUE)
 
-from utils import histograms_dict, wps_years, wps, tags, luminosities, hlt_paths, triggersCorrections, add_bdt, bdts_xml, hist_properties, init_mhhh, addMHHH
+from utils import histograms_dict, wps_years, wps, tags, luminosities, hlt_paths, triggersCorrections, add_bdt, bdts_xml, hist_properties, init_mhhh, addMHHH, clean_variables
 
 from optparse import OptionParser
 parser = OptionParser()
@@ -32,11 +32,13 @@ parser.add_option("--skip_do_plots", action="store_true", dest="skip_do_plots", 
 parser.add_option("--do_SR", action="store_true", dest="do_SR", help="Write...", default=False)
 parser.add_option("--do_CR", action="store_true", dest="do_CR", help="Write...", default=False)
 parser.add_option("--process ", type="string", dest="process_to_compute", help="Process to compute it. if no argument is given will do all", default='none')
+parser.add_option("--do_limit_tree ", type="string", dest="do_limit_tree", help="If given it will do the histograms only in that variable with all the uncertainties", default='none')
 ## separate SR_CR as an option, this option would add _SR and _CR to the subfolder name
 ## add option to enter a process and if that is given to make the trees and histos only to it
 ## add option to add BDT computation here -- or not, we leave this only to MVA input variables -- the prefit plots already do data/MC
 (options, args) = parser.parse_args()
 
+do_limit_tree      = options.do_limit_tree ## X: to implement
 process_to_compute = options.process_to_compute
 do_SR              = options.do_SR
 do_CR              = options.do_CR
@@ -52,27 +54,61 @@ if do_SR and do_CR :
 
 selections = {
     #"final_selection_jetMultiplicity" : "(nbtags > 4 && nfatjets == 0) || (nbtags > 2 && nfatjets > 0)",
-    "gt5bloose_test"                : "(Nloosebtags > 5 )",
-    "gt5bloose_0PFfat"              : "(Nloosebtags > 5 && nprobejets == 0)",
-    "gt5bloose_gt0medium_0PFfat"    : "(Nloosebtags > 5 && Nmediumbtags >0 && nprobejets == 0)",
-    "gt5bloose_gt1medium_0PFfat"    : "(Nloosebtags > 5 && Nmediumbtags >1 && nprobejets == 0)",
-    "gt5bloose_gt2medium_0PFfat"    : "(Nloosebtags > 5 && Nmediumbtags >2 && nprobejets == 0)",
-    "gt5bloose_gt3medium_0PFfat"    : "(Nloosebtags > 5 && Nmediumbtags >3 && nprobejets == 0)", # need to redo signal / da
-    "gt5bloose_gt4medium_0PFfat"    : "(Nloosebtags > 5 && Nmediumbtags >4 && nprobejets == 0)",
-    "gt5bmedium_0PFfat"             : "(Nmediumbtags > 5 && nprobejets == 0)",
-    "1PFfat"                        : "(nprobejets == 1)",
-    "gt1PFfat"                      : "(nprobejets > 1)",
-    "gt0PFfat"                      : "(nprobejets > 1)",
+    "gt5bloose_test"                : {
+        "sel" : "(Nloosebtags > 5 )",
+        "label" : "6L"
+        },
+    "gt5bloose_0PFfat"              : {
+        "sel" : "(Nloosebtags > 5 && nprobejets == 0)",
+        "label" : "Resolved 6L"
+        },
+    "gt5bloose_gt0medium_0PFfat"    : {
+        "sel" : "(Nloosebtags > 5 && Nmediumbtags >0 && nprobejets == 0)",
+        "label" : "Resolved 1M 5L"
+        },
+    "gt5bloose_gt1medium_0PFfat"    : {
+        "sel" : "(Nloosebtags > 5 && Nmediumbtags >1 && nprobejets == 0)",
+        "label" : "Resolved 2M 4L"
+        },
+    "gt5bloose_gt2medium_0PFfat"    : {
+        "sel" : "(Nloosebtags > 5 && Nmediumbtags >2 && nprobejets == 0)",
+        "label" : "Resolved 3M 3L"
+        },
+    "gt5bloose_gt3medium_0PFfat"    : {
+        "sel" : "(Nloosebtags > 5 && Nmediumbtags >3 && nprobejets == 0)",
+        "label" : "Resolved 4M 2L"
+        },
+    "gt5bloose_gt4medium_0PFfat"    : {
+        "sel" : "(Nloosebtags > 5 && Nmediumbtags >4 && nprobejets == 0)",
+        "label" : "Resolved 5M 1L"
+        },
+    "gt5bmedium_0PFfat"             : {
+        "sel" : "(Nmediumbtags > 5 && nprobejets == 0)",
+        "label" : "Resolved 6M"
+        },
+    "1PFfat"                        : {
+        "sel" : "(nprobejets == 1)",
+        "label" : "Boosted (1 PN fat jet)"
+        },
+    "gt1PFfat"                      : {
+        "sel" : "(nprobejets > 1)",
+        "label" : "Boosted (> 1 PN fat jet)"
+        },
+    "gt0PFfat"                      : {
+        "sel" : "(nprobejets > 1)",
+        "label" : "Boosted (> 0 PN fat jet)"
+        },
+    ## you can add here categories with PN score
 }
 
 additional_selection = ""
 additional_label     = ""
 if do_SR :
     additional_selection = " && (h_fit_mass > 80 && h_fit_mass < 150)"
-    additional_label     = "_SR"
+    additional_label     = "SR"
 if do_CR :
     additional_selection = " && !(h_fit_mass > 80 && h_fit_mass < 150)"
-    additional_label     = "_CR"
+    additional_label     = "CR"
 
 # define function to run on mHHH
 init_mhhh()
@@ -97,14 +133,13 @@ for selection in selections.keys() :
       if not selection == cat :
           continue
 
-
-  final_selection = selections[selection]
+  final_selection = selections[selection]["sel"]
   if not additional_selection == "" :
-      final_selection = "(%s %s)" % (selections[selection], additional_selection)
+      final_selection = "(%s %s)" % (selections[selection]["sel"], additional_selection)
 
-  print("Doing tree skimmed for %s%s" % (selection, additional_label))
+  print("Doing tree skimmed for %s_%s" % (selection, additional_label))
   print(final_selection)
-  output_folder = "{}/{}{}".format(input_tree,selection,additional_label)
+  output_folder = "{}/{}_{}".format(input_tree,selection,additional_label)
   if not path.exists(output_folder) :
       procs=subprocess.Popen(['mkdir %s' % output_folder],shell=True,stdout=subprocess.PIPE)
       out = procs.stdout.read()
@@ -121,7 +156,7 @@ for selection in selections.keys() :
         else:
             datahist = 'BTagCSV'
 
-    outtree = "{}/{}{}/{}.root".format(input_tree,selection,additional_label,proctodo)
+    outtree = "{}/{}_{}/{}.root".format(input_tree,selection,additional_label,proctodo)
 
     list_proc=glob.glob("{}/inclusive/{}.root".format(input_tree,datahist))
     print("Will create %s" % outtree)
@@ -168,61 +203,9 @@ for selection in selections.keys() :
         print("starting to construct calibrations")
         variables = list(chunk_df.GetColumnNames())
 
-
         print("Cleaning variables", len(variables))
-
-        for testing in ["HLT", "LHE", "v_", "L1_", "l1PreFiringWeight", "trigger", "vbf", "lep",  "pu", "_Up", "_Down", 'passmetfilters', 'PSWeight', "boostedTau", "boostedTau_"] :
-            for var in variables :
-                if str(var).find(testing) != -1:
-                    variables.remove(var)
-
-        # remove variables based on 6 first btags to not confuse
-        for var in ['nloosebtags', 'nmediumbtags', 'ntightbtags'] :
-            variables.remove(var)
-
-        for var in [ 'LHEReweightingWeight', 'LHEScaleWeightNormNew', 'fatJet3PtOverMHH_JMS_Down', 'fatJet3PtOverMHH_MassRegressed_JMS_Down', 'genHiggs1Eta', 'genHiggs1Phi', 'genHiggs1Pt', 'genHiggs2Eta', 'genHiggs2Phi', 'genHiggs2Pt', 'genHiggs3Eta', 'genHiggs3Phi', 'genHiggs3Pt', 'genTtbarId', 'genWeight', "xsecWeight", "nfatjets", 'l1PreFiringWeightDown', 'lep1Id', 'lep1Pt', 'lep2Id', 'lep2Pt', "eventWeightBTagSF", "eventWeightBTagCorrected", "weight", "PV_npvs", "boostedTau_phi", "boostedTau_rawAntiEleCat2018", "boostedTau_eta", "boostedTau_idMVAoldDM2017v2", "boostedTau_leadTkDeltaPhi", "boostedTau_rawMVAoldDM2017v2", 'boostedTau_rawIsodR03', 'HLT_AK8PFHT800_TrimMass50', 'HLT_AK8PFHT900_TrimMass50', 'HLT_AK8PFJet200', 'HLT_AK8PFJet320', 'HLT_AK8PFJet330_PFAK8BTagCSV_p17', 'HLT_AK8PFJet380_TrimMass30', 'HLT_AK8PFJet400', 'HLT_AK8PFJet420_TrimMass30', 'HLT_AK8PFJet500', 'HLT_AK8PFJet60', 'HLT_AK8PFJetFwd140', 'HLT_AK8PFJetFwd260', 'HLT_AK8PFJetFwd40', 'HLT_AK8PFJetFwd450', 'HLT_AK8PFJetFwd60', 'HLT_Ele27_WPTight_Gsf', 'HLT_HT300PT30_QuadJet_75_60_45_40', 'HLT_PFHT380_SixPFJet32', 'HLT_PFHT380_SixPFJet32_DoublePFBTagDeepCSV_2p2', 'HLT_PFHT430_SixJet40_BTagCSV_p080', 'HLT_PFMET120_PFMHT120_IDTight_PFHT60', 'HLT_PFMETNoMu120_PFMHTNoMu120_IDTight_HFCleaned', 'HLT_PFMETNoMu130_PFMHTNoMu130_IDTight', 'HLT_PFMETTypeOne100_PFMHT100_IDTight_PFHT60', 'HLT_PFMETTypeOne120_PFMHT120_IDTight', 'HLT_Ele32_WPTight_Gsf_L1DoubleEG', 'HLT_Ele38_WPTight_Gsf', 'HLT_IsoMu20', 'HLT_IsoMu24_eta2p1', 'HLT_IsoMu30', 'HLT_Mu55', 'HLT_PFHT180', 'HLT_PFHT300PT30_QuadPFJet_75_60_45_40', 'HLT_PFHT350', 'HLT_PFHT370', 'HLT_PFHT380_SixPFJet32_DoublePFBTagCSV_2p2', 'HLT_PFHT430', 'HLT_PFHT430_SixPFJet40_PFBTagCSV_1p5', 'HLT_PFHT500_PFMET110_PFMHT110_IDTight', 'HLT_PFHT590', 'HLT_PFHT700_PFMET85_PFMHT85_IDTight', 'HLT_PFHT780', 'HLT_PFHT800_PFMET85_PFMHT85_IDTight', 'HLT_PFJet140', 'HLT_PFJet260', 'HLT_PFJet40', 'HLT_PFJet450', 'HLT_PFJet550', 'HLT_PFJet80', 'HLT_PFJetFwd200', 'HLT_PFJetFwd320', 'HLT_PFJetFwd400', 'HLT_PFJetFwd500', 'HLT_PFJetFwd80', 'HLT_PFMET100_PFMHT100_IDTight_PFHT60', 'HLT_PFMET110_PFMHT110_IDTight_CaloBTagCSV_3p1', 'HLT_PFMET120_PFMHT120_IDTight_CaloBTagCSV_3p1', 'HLT_PFMET130_PFMHT130_IDTight', 'HLT_PFMET140_PFMHT140_IDTight', 'HLT_PFMET200_HBHECleaned', 'HLT_PFMET200_NotCleaned', 'HLT_PFMET300_HBHECleaned', 'HLT_PFMETNoMu110_PFMHTNoMu110_IDTight', 'HLT_PFMETNoMu120_PFMHTNoMu120_IDTight_PFHT60', 'HLT_PFMETNoMu140_PFMHTNoMu140_IDTight', 'HLT_PFMETTypeOne110_PFMHT110_IDTight', 'HLT_PFMETTypeOne120_PFMHT120_IDTight_PFHT60', 'HLT_PFMETTypeOne140_PFMHT140_IDTight', 'HLT_Photon175', 'HLT_QuadPFJet103_88_75_15_BTagCSV_p013_VBF2', 'HLT_QuadPFJet105_88_76_15', 'HLT_QuadPFJet105_90_76_15_DoubleBTagCSV_p013_p08_VBF1', 'HLT_QuadPFJet111_90_80_15_BTagCSV_p013_VBF2', 'HLT_QuadPFJet98_83_71_15', 'HLT_QuadPFJet98_83_71_15_DoubleBTagCSV_p013_p08_VBF1', 'L1_HTT280er_QuadJet_70_55_40_35_er2p5', 'L1_HTT320er_QuadJet_70_55_40_40_er2p4', 'L1_HTT320er_QuadJet_70_55_45_45_er2p5', 'L1_HTT450er', 'nfatjets', 'ptj2_over_ptj1', 'ptj3_over_ptj1', 'ptj3_over_ptj2', 'rho', 'LHE_Vpt', 'fatJet2PtOverMHH_JMS_Down', 'fatJet2PtOverMHH_MassRegressed_JMS_Down', 'mva', 'nLHEReweightingWeight', 'nbtags',  'puWeightDown', 'triggerEffMC3DWeight', 'triggerEffWeight', 'l1PreFiringWeightDown', 'lep1Id', 'lep1Pt', 'lep2Id', 'lep2Pt', 'v_1', 'v_11', 'v_13', 'v_15', 'v_17', 'v_19', 'v_20', 'v_22', 'v_24', 'v_26', 'v_28', 'v_3', 'v_31', 'v_33', 'v_35', 'v_37', 'v_39', 'v_40', 'v_42', 'v_44', 'v_46', 'v_48', 'v_5', 'v_51', 'v_53', 'v_55', 'v_57', 'v_59', 'v_60', 'v_7', 'v_9', 'vbffatJet1PNetXbb', 'vbffatJet1Pt', 'vbffatJet2PNetXbb', 'vbffatJet2Pt', 'vbfjet1Mass', 'vbfjet1Pt', 'vbfjet2Mass', 'vbfjet2Pt', 'boostedTau_pt', 'boostedTau_idAntiMu', 'boostedTau_jetIdx', 'boostedTau_mass', 'h1h2_mass_squared', 'h2h3_mass_squared', 'deltaEta_j1j3', 'deltaPhi_j1j3', 'deltaR_j1j3', 'mj3_over_mj1', 'mj3_over_mj1_MassRegressed', 'deltaEta_j2j3', 'deltaPhi_j2j3', 'deltaR_j2j3', 'mj3_over_mj2', 'mj3_over_mj2_MassRegressed', 'isVBFtag', 'dijetmass', 'nsmalljets',  'jet7BTagSF', 'jet8BTagSF', 'jet9BTagSF', 'jet10BTagSF', 'ratioPerEvent', "LHEPdfWeightNorm", "LHEScaleWeight", 'hh_eta_JMS_Down', 'hh_eta_MassRegressed_JMS_Down', 'hh_mass_JMS_Down', 'hh_mass_MassRegressed_JMS_Down', 'hh_pt_JMS_Down', 'hh_pt_MassRegressed', 'hh_pt_MassRegressed_JMS_Down',  'hhh_eta_JMS_Down', 'hhh_eta_MassRegressed_JMS_Down', 'hhh_mass_JMS_Down', 'hhh_mass_MassRegressed_JMS_Down', 'fatJet1PtOverMHH_JMS_Down', 'fatJet1PtOverMHH_MassRegressed_JMS_Down',  'eventWeight', 'hhh_pt_JMS_Down', 'hhh_pt_MassRegressed', 'hhh_pt_MassRegressed_JMS_Down', 'mj2_over_mj1', 'mj2_over_mj1_MassRegressed'] :
-            try :
-                variables.remove(var)
-            except:
-                1 == 1
-
-        for hhhvar in ['hhh_resolved_mass', 'hhh_resolved_pt', 'hhh_t3_pt', 'hhh_mass', 'hhh_pt', "hh_eta", "hh_mass", "hh_phi", "hh_pt", "hhh_eta", "hhh_phi",] :
-            #print("removed %s" % hhhvar)
-            variables.remove(hhhvar)
-
-        # those above are not what we think they are
-        for hhhvar in [ 'eta_MassRegressed', 'phi_MassRegressed', 'mass_MassRegressed'] :
-            variables.remove('hhh_{}'.format(hhhvar))
-            variables.remove('hh_{}'.format(hhhvar))
-
-        for jet_number in range(1,11) :
-            for jetvar in ['DeepFlavB', 'HiggsMatched', 'HasMuon', 'HasElectron', 'FatJetMatched', 'HiggsMatchedIndex', 'MatchedGenPt', 'JetId', 'PuId', 'HadronFlavour', 'FatJetMatchedIndex', 'RawFactor', 'LooseBTagEffSF', 'MediumBTagEffSF', 'TightBTagEffSF'] :
-                try :
-                    variables.remove('jet{}{}'.format(jet_number,jetvar))
-                except:
-                    1 == 1
-
-        for jet_number in range(1,7) :
-            for jetvar in ['DeepFlavB', 'BTagSF', 'TightTTWeight', 'MediumTTWeight', 'LooseTTWeight', 'HiggsMatched', 'HasMuon', 'HasElectron', 'FatJetMatched', 'HiggsMatchedIndex', 'MatchedGenPt', 'JetId', 'PuId', 'HadronFlavour', 'FatJetMatchedIndex', 'RawFactor'] :
-                try :
-                    variables.remove('bcand{}{}'.format(jet_number,jetvar))
-                except:
-                    1 == 1
-
-        for jet_number in range(1,4) :
-            variables.remove('h{}_t3_match'.format(jet_number))
-            variables.remove('h{}_t2_dRjets'.format(jet_number))
-            for hvar in ["pt", "eta", "phi", "mass", "match"] :
-                variables.remove('h{}_t2_{}'.format(jet_number, hvar))
-                variables.remove('h{}_{}'.format(jet_number, hvar))
-
-            # MassRegressed is saved as Mass simply
-            for fatvar in ["HasBJetCSVLoose", "MassSD", "HasMuon", "HasElectron", "HiggsMatched", "OppositeHemisphereHasBJet", "NSubJets", "HiggsMatchedIndex", "GenMatchIndex", "MassRegressed_UnCorrected", "PtOverMHH_MassRegressed", "PtOverMSD", "PtOverMRegressed", "MassSD_noJMS", "RawFactor", "MassRegressed_JMS_Down", "MassSD_JMS_Down", "MassRegressed", 'Tau3OverTau2', 'PtOverMHH', 'MatchedGenPt', "MassSD_UnCorrected"] :
-                try :
-                    variables.remove('fatJet{}{}'.format(jet_number,fatvar))
-                except:
-                    1 == 1
-
+        variables = clean_variables(variables)
+        ## if to do limit the cleaning will be different
         print("Cleaned variables", len(variables))
         print(variables)
         ## cleaning is not working for all variables, even if explicitelly asking to remove all that name, and for some not cleaned variables will given
@@ -287,6 +270,11 @@ for selection in selections.keys() :
         print("Minutes to load : ", (seconds-seconds0)/60.0)
 
   ## do Histograms -- reorganize to do directly limits
+  output_histos = "{}/{}_{}/histograms".format(input_tree,selection,additional_label)
+  if not path.exists(output_histos) :
+    procs=subprocess.Popen(['mkdir %s' % output_histos],shell=True,stdout=subprocess.PIPE)
+    out = procs.stdout.read()
+
   if not skip_do_histograms : # args.doHistograms:
    for proctodo in procstodo :
     datahist = proctodo
@@ -297,13 +285,7 @@ for selection in selections.keys() :
             datahist = 'BTagCSV'
 
 
-    outtree = "{}/{}{}/{}.root".format(input_tree,selection,additional_label,proctodo) ## make better, to not have to call it twice
-    ## do Histograms
-    output_histos = "{}/{}{}/histograms".format(input_tree,selection,additional_label)
-
-    if not path.exists(output_histos) :
-      procs=subprocess.Popen(['mkdir %s' % output_histos],shell=True,stdout=subprocess.PIPE)
-      out = procs.stdout.read()
+    outtree = "{}/{}_{}/{}.root".format(input_tree,selection,additional_label,proctodo) ## make better, to not have to call it twice
 
     chunk_df = ROOT.RDataFrame(inputTree, outtree)
     seconds0 = time.time()
@@ -334,6 +316,8 @@ for selection in selections.keys() :
 
     histograms.append(h)
     for var in variables: # booking all variables to be produced
+        if "Resolved" in selections[selection]["label"] and "fatJet" in var :
+            continue
         try :
             histograms_dict[var]
         except :
@@ -363,14 +347,10 @@ for selection in selections.keys() :
 
   if not skip_do_plots :
       # Draw the data/MC to this selection
-      command = "python3 draw_data_mc_categories.py --input_folder %s" % output_histos
-      if "0PFfat" in selection :
-          command = command + " --log"
+      command = "python3 draw_data_mc_categories.py --input_folder %s --plot_label '%s (%s)'" % (output_histos, selections[selection]["label"], additional_label)
+      #if "0PFfat" in selection :
+      #command = command + " --log"
       print(command)
 
       proc=subprocess.Popen([command],shell=True,stdout=subprocess.PIPE)
       out = proc.stdout.read()
-
-      #for proctodo in procstodo :
-      #file_data = ROOT.TFile(histo_path + '/' + 'histograms_%s.root'%(datahist))
-            # python make_histograms_rdataframe_selection.py --version v25 --year 2017 --region gt5bloose_0PFfat --inputs_path /eos/user/m/mstamenk/CxAOD31run/hhh-6b/v25/2017/baseline/gt5bloose_0PFfat/ --outputs_path /eos/user/m/mstamenk/CxAOD31run/hhh-6b/v25/2017/baseline/gt5bloose_0PFfat/data_mc --doHistograms

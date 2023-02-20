@@ -64,14 +64,19 @@ With the script bellow we redefine a couple of variables and construct trees, hi
 
 - several btag and fat jet categories selections are implemented. There is also an option to make the results with SR/CR separation
 
-- read the script [here]() for the category implemented_category options
+- read the script [here](https://github.com/mstamenk/hhh-analysis-framework/blob/main/skimm_tree.py#L53) for the category implemented_category options. Implemented more as needed (eg PN categorization in boosted categories)
 
 ```
-skimm_tree.py --category implemented_category --base_folder /eos/user/m/mstamenk/CxAOD31run/hhh-6b/v25/2017/baseline
+python3 skimm_tree.py --category implemented_category --base_folder /eos/user/m/mstamenk/CxAOD31run/hhh-6b/v25/2017/baseline
 ```
 
+- The histograms options are [here]().
+  - If you change the histogram binning and want to redo the plots, there is no need to re-do tress, just pass `--skip_do_trees` as argument to the `skimm_tree.py`
 
+- The plotting options are [here]().
+  - If you change just plotting options (eg color, stack ordering, ...) and want to redo the plots, there is no need to re-do tress, just pass `--skip_do_trees  --skip_do_histograms` as argument to the `skimm_tree.py`
 
+Read the other options as necessary
 
 
 One can also inspect the yields on the different categories with the bellow.

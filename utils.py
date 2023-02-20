@@ -6,7 +6,7 @@ import ROOT
 
 q = random.uniform(0,1)
 
-luminosities = {'2016' : 36330.0,
+luminosities = {#'2016' : 36330.0,
                 '2016APV' : 19207.0,
                 '2016PostAPV' : 17122.0,
                 '2016' : 17122.0,
@@ -61,10 +61,10 @@ histograms_dict = {
 
         'bcand1Pt'  : { "nbins" : 50 , "xmin" : 0 , "xmax" : 500, "label" : 'b-candidate 1 p_{T} (GeV)'},
         'bcand2Pt'  : { "nbins" : 50 , "xmin" : 0 , "xmax" : 500, "label" : 'b-candidate 2 p_{T} (GeV)'},
-        'bcand3Pt'  : { "nbins" : 50 , "xmin" : 0 , "xmax" : 500, "label" : 'b-candidate 3 p_{T} (GeV)'},
-        'bcand4Pt'  : { "nbins" : 50 , "xmin" : 0 , "xmax" : 500, "label" : 'b-candidate 4 p_{T} (GeV)'},
-        'bcand5Pt'  : { "nbins" : 50 , "xmin" : 0 , "xmax" : 500, "label" : 'b-candidate 5 p_{T} (GeV)'},
-        'bcand6Pt'  : { "nbins" : 50 , "xmin" : 0 , "xmax" : 500, "label" : 'b-candidate 6 p_{T} (GeV)'},
+        'bcand3Pt'  : { "nbins" : 45 , "xmin" : 0 , "xmax" : 450, "label" : 'b-candidate 3 p_{T} (GeV)'},
+        'bcand4Pt'  : { "nbins" : 35 , "xmin" : 0 , "xmax" : 350, "label" : 'b-candidate 4 p_{T} (GeV)'},
+        'bcand5Pt'  : { "nbins" : 25 , "xmin" : 0 , "xmax" : 250, "label" : 'b-candidate 5 p_{T} (GeV)'},
+        'bcand6Pt'  : { "nbins" : 15 , "xmin" : 0 , "xmax" : 150, "label" : 'b-candidate 6 p_{T} (GeV)'},
 
         'bcand1Eta'  : { "nbins" : eta_bins , "xmin" : 0 , "xmax" : 2.5, "label" : 'b-candidate  1 #eta'},
         'bcand2Eta'  : { "nbins" : eta_bins , "xmin" : 0 , "xmax" : 2.5, "label" : 'b-candidate  2 #eta'},
@@ -130,12 +130,12 @@ histograms_dict = {
         'nprobejets'  : { "nbins" : 5 , "xmin" : 0 , "xmax" : 5, "label" : 'N fat-jets'},
         'nbtags'      : { "nbins" : 10 , "xmin" : 0 , "xmax" : 10, "label" : 'N b-tags'},
 
-        'Nloosebtags'   : { "nbins" : 10 , "xmin" : 0 , "xmax" : 10, "label" : 'N loose b-tags'},
+        'Nloosebtags'   : { "nbins" : 5 , "xmin" : 5 , "xmax" : 10, "label" : 'N loose b-tags'},
         'Nmediumbtags'  : { "nbins" : 10 , "xmin" : 0 , "xmax" : 10, "label" : 'N meidum b-tags'},
         'Ntightbtags'   : { "nbins" : 10 , "xmin" : 0 , "xmax" : 10, "label" : 'N tight b-tags'},
 
-        'ht'   : { "nbins" : 200 , "xmin" : 0 , "xmax" : 2000, "label" : 'Event HT [GeV]'},
-        'met'  : { "nbins" : 150 , "xmin" : 0 , "xmax" : 1500, "label" : 'E_{T}^{miss} [GeV]'},
+        'ht'   : { "nbins" : 90 , "xmin" : 0 , "xmax" : 1800, "label" : 'Event HT [GeV]'},
+        'met'  : { "nbins" : 25 , "xmin" : 0 , "xmax" : 500, "label" : 'E_{T}^{miss} [GeV]'},
         'bdt'  : { "nbins" : 20 , "xmin" : -1 , "xmax" : 1, "label" : 'BDT output score'},
         'mva'  : { "nbins" : 20 , "xmin" : -0.6 , "xmax" : 0.8, "label" : 'BDT output score'},
 
@@ -183,28 +183,110 @@ hist_properties = {'JetHT' : [ROOT.kBlack, 0.8, 0, 'Data', True] ,
                    'JetHT-btagSF' : [ROOT.kBlack, 0.8, 0, 'Data', True],
                    'BTagCSV' : [ROOT.kBlack, 0.8, 0, 'Data', True],
                    'data_obs' : [ROOT.kBlack, 0.8, 0, 'Data', True],
-                   'ZZZ' : [ROOT.kRed, 0, 2, 'VVV', True],
-                   'WWW' : [ROOT.kRed, 0, 2, 'VVV', False],
-                   'WZZ' : [ROOT.kRed, 0, 2, 'VVV', False],
-                   'WWZ' : [ROOT.kRed, 0, 2, 'VVV', False],
-                   'ZJetsToQQ'   : [ROOT.kCyan, 0, 2, 'V+jets', True],
-                   'WJetsToQQ'   : [ROOT.kCyan, 0, 2, 'V+jets', False],
-                   'ZZTo4Q' : [ROOT.kGray, 0, 2, 'VV', True],
-                   'WWTo4Q' : [ROOT.kGray, 0, 2, 'VV', False],
-                   'TT' : [ROOT.kBlue, 0,2, 't#bar{t}', True],
-                   'QCD'   : [ROOT.kOrange, 0, 2, 'QCD', True],
-                   'QCD6B'   : [ROOT.kOrange + 2, 0, 2, 'QCD6B', True],
-                   'GluGluToHHHTo6B_SM' : [ROOT.kRed, 0,2, 'SM HHH x 100', True],
+                   'ZZZ' : [ROOT.kGreen, 0, 0, 'VVV', True],
+                   'WWW' : [ROOT.kGreen, 0, 0, 'VVV', False],
+                   'WZZ' : [ROOT.kGreen, 0, 0, 'VVV', False],
+                   'WWZ' : [ROOT.kGreen, 0, 0, 'VVV', False],
+                   'TT' : [ROOT.kBlue, 0,0, 't#bar{t}', True],
+                   'ZZTo4Q' : [ROOT.kGray, 0, 0, 'VV', True],
+                   'WWTo4Q' : [ROOT.kGray, 0, 0, 'VV', False],
+                   'ZJetsToQQ'   : [ROOT.kCyan, 0, 0, 'V+jets', True],
+                   'WJetsToQQ'   : [ROOT.kCyan, 0, 0, 'V+jets', False],
+                   'QCD'   : [ROOT.kOrange, 0, 0, 'QCD', True],
+                   'QCD6B'   : [ROOT.kOrange + 2, 0, 0, 'QCD6B', True],
+                   'GluGluToHHHTo6B_SM' : [ROOT.kRed, 0,3, 'SM HHH', True],
         }
 
+def addLabel_CMS_preliminary(luminosity) :
 
-# cut loose = 0.0532 = 91%, medium = 0.3040 = 79%, tight = 0.7476 = 61%
+    x0 = 0.1
+    y0 = 0.988
+    ypreliminary = 0.988
+    xlumi = 0.69
+    label_cms = ROOT.TPaveText(x0, y0, x0 + 0.0950, y0, "NDC")
+    label_cms.AddText("CMS")
+    label_cms.SetTextFont(61)
+    label_cms.SetTextAlign(13)
+    label_cms.SetTextSize(0.045)
+    label_cms.SetTextColor(1)
+    label_cms.SetFillStyle(0)
+    label_cms.SetBorderSize(0)
+    label_preliminary = ROOT.TPaveText(x0 + 0.0950, ypreliminary, x0 + 0.2950, ypreliminary, "NDC")
+    label_preliminary.AddText("Internal")
+    label_preliminary.SetTextFont(52)
+    label_preliminary.SetTextAlign(13)
+    label_preliminary.SetTextSize(0.0450)
+    label_preliminary.SetTextColor(1)
+    label_preliminary.SetFillStyle(0)
+    label_preliminary.SetBorderSize(0)
+    label_luminosity = ROOT.TPaveText(xlumi, y0 + 0.01, xlumi, y0 + 0.01, "NDC")
+    label_luminosity.AddText("%s fb^{-1} (13 TeV)" % (str(round(luminosity/1000.0,1))))
+    label_luminosity.SetTextFont(42)
+    label_luminosity.SetTextAlign(13)
+    label_luminosity.SetTextSize(0.045)
+    label_luminosity.SetTextColor(1)
+    label_luminosity.SetFillStyle(0)
+    label_luminosity.SetBorderSize(0)
 
-# 2017
-#wps = { 'loose'  : '0.0532',
-#        'medium' : '0.3040',
-#        'tight'  : '0.7476',
-#        }
+    return [label_cms, label_preliminary, label_luminosity]
+
+
+def clean_variables(variables) :
+    for testing in ["HLT", "LHE", "v_", "L1_", "l1PreFiringWeight", "trigger", "vbf", "lep",  "pu", "_Up", "_Down", 'passmetfilters', 'PSWeight', "boostedTau", "boostedTau_"] :
+        for var in variables :
+            if str(var).find(testing) != -1:
+                variables.remove(var)
+
+    # remove variables based on 6 first btags to not confuse
+    for var in ['nloosebtags', 'nmediumbtags', 'ntightbtags'] :
+        variables.remove(var)
+
+    for var in [ 'LHEReweightingWeight', 'LHEScaleWeightNormNew', 'fatJet3PtOverMHH_JMS_Down', 'fatJet3PtOverMHH_MassRegressed_JMS_Down', 'genHiggs1Eta', 'genHiggs1Phi', 'genHiggs1Pt', 'genHiggs2Eta', 'genHiggs2Phi', 'genHiggs2Pt', 'genHiggs3Eta', 'genHiggs3Phi', 'genHiggs3Pt', 'genTtbarId', 'genWeight', "xsecWeight", "nfatjets", 'l1PreFiringWeightDown', 'lep1Id', 'lep1Pt', 'lep2Id', 'lep2Pt', "eventWeightBTagSF", "eventWeightBTagCorrected", "weight", "PV_npvs", "boostedTau_phi", "boostedTau_rawAntiEleCat2018", "boostedTau_eta", "boostedTau_idMVAoldDM2017v2", "boostedTau_leadTkDeltaPhi", "boostedTau_rawMVAoldDM2017v2", 'boostedTau_rawIsodR03', 'HLT_AK8PFHT800_TrimMass50', 'HLT_AK8PFHT900_TrimMass50', 'HLT_AK8PFJet200', 'HLT_AK8PFJet320', 'HLT_AK8PFJet330_PFAK8BTagCSV_p17', 'HLT_AK8PFJet380_TrimMass30', 'HLT_AK8PFJet400', 'HLT_AK8PFJet420_TrimMass30', 'HLT_AK8PFJet500', 'HLT_AK8PFJet60', 'HLT_AK8PFJetFwd140', 'HLT_AK8PFJetFwd260', 'HLT_AK8PFJetFwd40', 'HLT_AK8PFJetFwd450', 'HLT_AK8PFJetFwd60', 'HLT_Ele27_WPTight_Gsf', 'HLT_HT300PT30_QuadJet_75_60_45_40', 'HLT_PFHT380_SixPFJet32', 'HLT_PFHT380_SixPFJet32_DoublePFBTagDeepCSV_2p2', 'HLT_PFHT430_SixJet40_BTagCSV_p080', 'HLT_PFMET120_PFMHT120_IDTight_PFHT60', 'HLT_PFMETNoMu120_PFMHTNoMu120_IDTight_HFCleaned', 'HLT_PFMETNoMu130_PFMHTNoMu130_IDTight', 'HLT_PFMETTypeOne100_PFMHT100_IDTight_PFHT60', 'HLT_PFMETTypeOne120_PFMHT120_IDTight', 'HLT_Ele32_WPTight_Gsf_L1DoubleEG', 'HLT_Ele38_WPTight_Gsf', 'HLT_IsoMu20', 'HLT_IsoMu24_eta2p1', 'HLT_IsoMu30', 'HLT_Mu55', 'HLT_PFHT180', 'HLT_PFHT300PT30_QuadPFJet_75_60_45_40', 'HLT_PFHT350', 'HLT_PFHT370', 'HLT_PFHT380_SixPFJet32_DoublePFBTagCSV_2p2', 'HLT_PFHT430', 'HLT_PFHT430_SixPFJet40_PFBTagCSV_1p5', 'HLT_PFHT500_PFMET110_PFMHT110_IDTight', 'HLT_PFHT590', 'HLT_PFHT700_PFMET85_PFMHT85_IDTight', 'HLT_PFHT780', 'HLT_PFHT800_PFMET85_PFMHT85_IDTight', 'HLT_PFJet140', 'HLT_PFJet260', 'HLT_PFJet40', 'HLT_PFJet450', 'HLT_PFJet550', 'HLT_PFJet80', 'HLT_PFJetFwd200', 'HLT_PFJetFwd320', 'HLT_PFJetFwd400', 'HLT_PFJetFwd500', 'HLT_PFJetFwd80', 'HLT_PFMET100_PFMHT100_IDTight_PFHT60', 'HLT_PFMET110_PFMHT110_IDTight_CaloBTagCSV_3p1', 'HLT_PFMET120_PFMHT120_IDTight_CaloBTagCSV_3p1', 'HLT_PFMET130_PFMHT130_IDTight', 'HLT_PFMET140_PFMHT140_IDTight', 'HLT_PFMET200_HBHECleaned', 'HLT_PFMET200_NotCleaned', 'HLT_PFMET300_HBHECleaned', 'HLT_PFMETNoMu110_PFMHTNoMu110_IDTight', 'HLT_PFMETNoMu120_PFMHTNoMu120_IDTight_PFHT60', 'HLT_PFMETNoMu140_PFMHTNoMu140_IDTight', 'HLT_PFMETTypeOne110_PFMHT110_IDTight', 'HLT_PFMETTypeOne120_PFMHT120_IDTight_PFHT60', 'HLT_PFMETTypeOne140_PFMHT140_IDTight', 'HLT_Photon175', 'HLT_QuadPFJet103_88_75_15_BTagCSV_p013_VBF2', 'HLT_QuadPFJet105_88_76_15', 'HLT_QuadPFJet105_90_76_15_DoubleBTagCSV_p013_p08_VBF1', 'HLT_QuadPFJet111_90_80_15_BTagCSV_p013_VBF2', 'HLT_QuadPFJet98_83_71_15', 'HLT_QuadPFJet98_83_71_15_DoubleBTagCSV_p013_p08_VBF1', 'L1_HTT280er_QuadJet_70_55_40_35_er2p5', 'L1_HTT320er_QuadJet_70_55_40_40_er2p4', 'L1_HTT320er_QuadJet_70_55_45_45_er2p5', 'L1_HTT450er', 'nfatjets', 'ptj2_over_ptj1', 'ptj3_over_ptj1', 'ptj3_over_ptj2', 'rho', 'LHE_Vpt', 'fatJet2PtOverMHH_JMS_Down', 'fatJet2PtOverMHH_MassRegressed_JMS_Down', 'mva', 'nLHEReweightingWeight', 'nbtags',  'puWeightDown', 'triggerEffMC3DWeight', 'triggerEffWeight', 'l1PreFiringWeightDown', 'lep1Id', 'lep1Pt', 'lep2Id', 'lep2Pt', 'v_1', 'v_11', 'v_13', 'v_15', 'v_17', 'v_19', 'v_20', 'v_22', 'v_24', 'v_26', 'v_28', 'v_3', 'v_31', 'v_33', 'v_35', 'v_37', 'v_39', 'v_40', 'v_42', 'v_44', 'v_46', 'v_48', 'v_5', 'v_51', 'v_53', 'v_55', 'v_57', 'v_59', 'v_60', 'v_7', 'v_9', 'vbffatJet1PNetXbb', 'vbffatJet1Pt', 'vbffatJet2PNetXbb', 'vbffatJet2Pt', 'vbfjet1Mass', 'vbfjet1Pt', 'vbfjet2Mass', 'vbfjet2Pt', 'boostedTau_pt', 'boostedTau_idAntiMu', 'boostedTau_jetIdx', 'boostedTau_mass', 'h1h2_mass_squared', 'h2h3_mass_squared', 'deltaEta_j1j3', 'deltaPhi_j1j3', 'deltaR_j1j3', 'mj3_over_mj1', 'mj3_over_mj1_MassRegressed', 'deltaEta_j2j3', 'deltaPhi_j2j3', 'deltaR_j2j3', 'mj3_over_mj2', 'mj3_over_mj2_MassRegressed', 'isVBFtag', 'dijetmass', 'nsmalljets',  'jet7BTagSF', 'jet8BTagSF', 'jet9BTagSF', 'jet10BTagSF', 'ratioPerEvent', "LHEPdfWeightNorm", "LHEScaleWeight", 'hh_eta_JMS_Down', 'hh_eta_MassRegressed_JMS_Down', 'hh_mass_JMS_Down', 'hh_mass_MassRegressed_JMS_Down', 'hh_pt_JMS_Down', 'hh_pt_MassRegressed', 'hh_pt_MassRegressed_JMS_Down',  'hhh_eta_JMS_Down', 'hhh_eta_MassRegressed_JMS_Down', 'hhh_mass_JMS_Down', 'hhh_mass_MassRegressed_JMS_Down', 'fatJet1PtOverMHH_JMS_Down', 'fatJet1PtOverMHH_MassRegressed_JMS_Down',  'eventWeight', 'hhh_pt_JMS_Down', 'hhh_pt_MassRegressed', 'hhh_pt_MassRegressed_JMS_Down', 'mj2_over_mj1', 'mj2_over_mj1_MassRegressed'] :
+        try :
+            variables.remove(var)
+        except:
+            1 == 1
+
+    for hhhvar in ['hhh_resolved_mass', 'hhh_resolved_pt', 'hhh_t3_pt', 'hhh_mass', 'hhh_pt', "hh_eta", "hh_mass", "hh_phi", "hh_pt", "hhh_eta", "hhh_phi",] :
+        #print("removed %s" % hhhvar)
+        variables.remove(hhhvar)
+
+    # those above are not what we think they are
+    for hhhvar in [ 'eta_MassRegressed', 'phi_MassRegressed', 'mass_MassRegressed'] :
+        variables.remove('hhh_{}'.format(hhhvar))
+        variables.remove('hh_{}'.format(hhhvar))
+
+    for jet_number in range(1,11) :
+        for jetvar in ['DeepFlavB', 'HiggsMatched', 'HasMuon', 'HasElectron', 'FatJetMatched', 'HiggsMatchedIndex', 'MatchedGenPt', 'JetId', 'PuId', 'HadronFlavour', 'FatJetMatchedIndex', 'RawFactor', 'LooseBTagEffSF', 'MediumBTagEffSF', 'TightBTagEffSF'] :
+            try :
+                variables.remove('jet{}{}'.format(jet_number,jetvar))
+            except:
+                1 == 1
+
+    for jet_number in range(1,7) :
+        for jetvar in ['DeepFlavB', 'BTagSF', 'TightTTWeight', 'MediumTTWeight', 'LooseTTWeight', 'HiggsMatched', 'HasMuon', 'HasElectron', 'FatJetMatched', 'HiggsMatchedIndex', 'MatchedGenPt', 'JetId', 'PuId', 'HadronFlavour', 'FatJetMatchedIndex', 'RawFactor'] :
+            try :
+                variables.remove('bcand{}{}'.format(jet_number,jetvar))
+            except:
+                1 == 1
+
+    for jet_number in range(1,4) :
+        variables.remove('h{}_t3_match'.format(jet_number))
+        variables.remove('h{}_t2_dRjets'.format(jet_number))
+        for hvar in ["pt", "eta", "phi", "mass", "match"] :
+            variables.remove('h{}_t2_{}'.format(jet_number, hvar))
+            variables.remove('h{}_{}'.format(jet_number, hvar))
+
+        # MassRegressed is saved as Mass simply
+        for fatvar in ["HasBJetCSVLoose", "MassSD", "HasMuon", "HasElectron", "HiggsMatched", "OppositeHemisphereHasBJet", "NSubJets", "HiggsMatchedIndex", "GenMatchIndex", "MassRegressed_UnCorrected", "PtOverMHH_MassRegressed", "PtOverMSD", "PtOverMRegressed", "MassSD_noJMS", "RawFactor", "MassRegressed_JMS_Down", "MassSD_JMS_Down", "MassRegressed", 'Tau3OverTau2', 'PtOverMHH', 'MatchedGenPt', "MassSD_UnCorrected"] :
+            try :
+                variables.remove('fatJet{}{}'.format(jet_number,fatvar))
+            except:
+                1 == 1
+    return variables
+
+
+
 
 # 2018
 wps = { 'loose'  : '0.0490',
@@ -445,17 +527,7 @@ def add_bdt(df, year):
     method_call = ','.join(ls_call)
 
     # Split even and odd numbers and apply it different mva training
-    #print(" auto computeModel(%s){if (event"%(method_all) + "%"+ " 2 == 0) { return model_even.Compute({%s});}else {return model_odd.Compute({%s});}}"%(method_bdt,method_bdt))
     ROOT.gInterpreter.Declare(" auto computeModel(%s){ auto prediction = model_odd.Compute({%s}); if (event"%(method_all,method_bdt) + "%"+ " 2 == 0) { prediction =  model_even.Compute({%s});} return prediction;}"%(method_bdt))
-    #ROOT.gInterpreter.Declare(" auto computeModel(%s){if (event"%(method_all) + "%"+ " 2 == 0) { return model_even.Compute({%s});}}"%(method_bdt))
-    #ROOT.gInterpreter.Declare(" auto computeModel(%s){if (event"%(method_all) + "%"+ " 2 == 0) { return model_even.Compute({%s});}}"%(method_bdt))
-    #ROOT.gInterpreter.Declare(" float computeModel(%s){ float sf = 0; if (event"%(method_all) + "%"+ " 2 == 0) { sf = 0;} else {sf = 1;} return sf;}")
-    #method_all = 'int eventnumber'
-    #print(" auto computeModel(%s){if (eventnumber"%(method_all) + "%"+ " 2 == 0){ return computeModel_even(%s);}else {return computeModel_odd(%s);}}"%(method_bdt,method_bdt))
-    #print("float computeModel(%s){if (eventnumber"%(method_all) + "%"+ " 2 == 0){ return 0;}else {return 1;}}")
-
-    #df = df.Define('mva', ROOT.computeModel, l_varn)
-    #df = df.Define('mva', 'computeModel(%s)'%method_call)
     df = df.Define('mva', 'computeModel(%s)'%method_call)
 
     return df
