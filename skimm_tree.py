@@ -26,13 +26,14 @@ from optparse import OptionParser
 parser = OptionParser()
 parser.add_option("--base_folder ", type="string", dest="base", help="Folder in where to look for the categories", default='/eos/user/m/mstamenk/CxAOD31run/hhh-6b/v25/2017/baseline_recomputedSF/')
 parser.add_option("--category ", type="string", dest="category", help="Category to compute it. if no argument is given will do all", default='none')
+parser.add_option("--skip_do_trees", action="store_true", dest="skip_do_trees", help="Write...", default=False)
+parser.add_option("--skip_do_histograms", action="store_true", dest="skip_do_histograms", help="Write...", default=False)
 ## separate SR_CR as an option, this option would add _SR and _CR to the subfolder name
-## skip do trees
 ## add option to add BDT computation here -- or not, we leave this only to MVA input variables -- the prefit plots already do data/MC
 (options, args) = parser.parse_args()
 
-skip_do_trees      = False
-skip_do_histograms = False
+skip_do_trees      = options.skip_do_trees
+skip_do_histograms = options.skip_do_histograms
 input_tree         = options.base
 cat                = options.category
 
