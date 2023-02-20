@@ -28,6 +28,7 @@ parser.add_option("--base_folder ", type="string", dest="base", help="Folder in 
 parser.add_option("--category ", type="string", dest="category", help="Category to compute it. if no argument is given will do all", default='none')
 parser.add_option("--skip_do_trees", action="store_true", dest="skip_do_trees", help="Write...", default=False)
 parser.add_option("--skip_do_histograms", action="store_true", dest="skip_do_histograms", help="Write...", default=False)
+parser.add_option("--skip_do_plots", action="store_true", dest="skip_do_plots", help="Write...", default=False)
 ## separate SR_CR as an option, this option would add _SR and _CR to the subfolder name
 ## add option to enter a process and if that is given to make the trees and histos only to it
 ## add option to add BDT computation here -- or not, we leave this only to MVA input variables -- the prefit plots already do data/MC
@@ -35,6 +36,7 @@ parser.add_option("--skip_do_histograms", action="store_true", dest="skip_do_his
 
 skip_do_trees      = options.skip_do_trees
 skip_do_histograms = options.skip_do_histograms
+skip_do_plots = options.skip_do_plots
 input_tree         = options.base
 cat                = options.category
 
@@ -341,7 +343,14 @@ for selection in selections.keys() :
     print("Seconds to load : ", seconds-seconds0)
     print("Minutes to load : ", (seconds-seconds0)/60.0)
 
-  # Draw the data/MC to this selection
-  #for proctodo in procstodo :
-  #file_data = ROOT.TFile(histo_path + '/' + 'histograms_%s.root'%(datahist))
-        # python make_histograms_rdataframe_selection.py --version v25 --year 2017 --region gt5bloose_0PFfat --inputs_path /eos/user/m/mstamenk/CxAOD31run/hhh-6b/v25/2017/baseline/gt5bloose_0PFfat/ --outputs_path /eos/user/m/mstamenk/CxAOD31run/hhh-6b/v25/2017/baseline/gt5bloose_0PFfat/data_mc --doHistograms
+  if not skip_do_plots :
+      # Draw the data/MC to this selection
+      command = "python3 draw_data_mc_categories.py --input_folder %s" % output_histos
+      print(command)
+
+      proc=subprocess.Popen([command],shell=True,stdout=subprocess.PIPE)
+      out = proc.stdout.read()
+
+      #for proctodo in procstodo :
+      #file_data = ROOT.TFile(histo_path + '/' + 'histograms_%s.root'%(datahist))
+            # python make_histograms_rdataframe_selection.py --version v25 --year 2017 --region gt5bloose_0PFfat --inputs_path /eos/user/m/mstamenk/CxAOD31run/hhh-6b/v25/2017/baseline/gt5bloose_0PFfat/ --outputs_path /eos/user/m/mstamenk/CxAOD31run/hhh-6b/v25/2017/baseline/gt5bloose_0PFfat/data_mc --doHistograms
