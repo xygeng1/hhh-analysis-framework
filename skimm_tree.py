@@ -20,7 +20,7 @@ import gc
 
 ROOT.gROOT.SetBatch(ROOT.kTRUE)
 
-from utils import labels, wps_years, binnings, cuts, wps, tags, luminosities, hlt_paths, triggersCorrections, add_bdt, bdts_xml, hist_properties, init_mhhh, addMHHH
+from utils import histograms_dict, wps_years, wps, tags, luminosities, hlt_paths, triggersCorrections, add_bdt, bdts_xml, hist_properties, init_mhhh, addMHHH
 
 from optparse import OptionParser
 parser = OptionParser()
@@ -238,7 +238,7 @@ for selection in selections.keys() :
                         #print("Take absolute of %s" % obj)
                         chunk_df = chunk_df.Redefine(obj, "abs(%s)" % obj)
                 chunk_df = chunk_df.Redefine('hhh_eta', "abs(hhh_eta)")
-                chunk_df = chunk_df.Redefine('hh_phi', "abs(hh_phi)")
+                #chunk_df = chunk_df.Redefine('hh_phi', "abs(hh_phi)")
 
         print("2 - construct the eventWeight")
         to_multiply = []
@@ -317,16 +317,13 @@ for selection in selections.keys() :
     if not len(variables) > 0 :
         print("process %s has 0 entries, skipping doing the histogram" % proctodo)
         continue
-    #print(labels.keys())
-    #variables = [v for v in labels if 'h_fit_mass' not in v and 'match' not in v and 'Match' not in v] # can be done better
     print("Will produce histograms for following variables:")
     print(variables)
 
     # Rdataframes require first histogram to be produced and then the rest is nested in the loop of the first one
-    binning = binnings['h_fit_mass'].replace('(','').replace(')','').split(',')
-    bins = int(binning[0])
-    xmin = float(binning[1])
-    xmax = float(binning[2])
+    bins = histograms_dict['h_fit_mass']["nbins"]
+    xmin = histograms_dict['h_fit_mass']["xmin"]
+    xmax = histograms_dict['h_fit_mass']["xmax"]
 
     print(bins,xmin,xmax)
     h = chunk_df.Histo1D(("h_fit_mass","h_fit_mass",bins,xmin,xmax),"h_fit_mass", "totalWeight") # booking the rdataframe loop
@@ -338,14 +335,13 @@ for selection in selections.keys() :
     histograms.append(h)
     for var in variables: # booking all variables to be produced
         try :
-            binnings[var]
+            histograms_dict[var]
         except :
             print("Skip doing histogram to %s, if you want to draw add the binning option in utils" % var)
             continue
-        binning = binnings[var].replace('(','').replace(')','').split(',')
-        bins = int(binning[0])
-        xmin = float(binning[1])
-        xmax = float(binning[2])
+        bins = histograms_dict[var]["nbins"]
+        xmin = histograms_dict[var]["xmin"]
+        xmax = histograms_dict[var]["xmax"]
         char_var = var.c_str()
         print(var,char_var,bins,xmin,xmax)
         h_tmp = chunk_df.Histo1D((char_var,char_var,bins,xmin,xmax),var, "totalWeight")
@@ -368,6 +364,8 @@ for selection in selections.keys() :
   if not skip_do_plots :
       # Draw the data/MC to this selection
       command = "python3 draw_data_mc_categories.py --input_folder %s" % output_histos
+      if "0PFfat" in selection :
+          command = command + " --log"
       print(command)
 
       proc=subprocess.Popen([command],shell=True,stdout=subprocess.PIPE)
