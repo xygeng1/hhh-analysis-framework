@@ -24,7 +24,7 @@ from utils import histograms_dict, wps_years, wps, tags, luminosities, hlt_paths
 
 from optparse import OptionParser
 parser = OptionParser()
-parser.add_option("--base_folder ", type="string", dest="base", help="Folder in where to look for the categories", default='/eos/user/m/mstamenk/CxAOD31run/hhh-6b/v25/2017/baseline_recomputedSF/')
+parser.add_option("--base_folder ", type="string", dest="base", help="Folder in where to look for the categories", default='/isilon/data/users/mstamenk/eos-triple-h/v25/mva-inputs-HLT-boosted-bdt-v25-inclusive-loose-wp-0ptag-2018/')
 parser.add_option("--category ", type="string", dest="category", help="Category to compute it. if no argument is given will do all", default='none')
 parser.add_option("--skip_do_trees", action="store_true", dest="skip_do_trees", help="Write...", default=False)
 parser.add_option("--skip_do_histograms", action="store_true", dest="skip_do_histograms", help="Write...", default=False)
@@ -60,54 +60,115 @@ selections = {
         },
     "gt5bloose_0PFfat"              : {
         "sel" : "(Nloosebtags > 5 && nprobejets == 0)",
-        "label" : "Resolved 6L"
+        "label" : "Resolved 6L",
+        "doSR" : "&& (h_fit_mass > 80 && h_fit_mass < 150)",
+        "doCR" : "&& !(h_fit_mass > 80 && h_fit_mass < 150)",
+
         },
     "gt5bloose_gt0medium_0PFfat"    : {
         "sel" : "(Nloosebtags > 5 && Nmediumbtags >0 && nprobejets == 0)",
-        "label" : "Resolved 1M 5L"
+        "label" : "Resolved 1M 5L",
+        "doSR" : "&& (h_fit_mass > 80 && h_fit_mass < 150)",
+        "doCR" : "&& !(h_fit_mass > 80 && h_fit_mass < 150)",
         },
     "gt5bloose_gt1medium_0PFfat"    : {
         "sel" : "(Nloosebtags > 5 && Nmediumbtags >1 && nprobejets == 0)",
-        "label" : "Resolved 2M 4L"
+        "label" : "Resolved 2M 4L",
+        "doSR" : "&& (h_fit_mass > 80 && h_fit_mass < 150)",
+        "doCR" : "&& !(h_fit_mass > 80 && h_fit_mass < 150)",
         },
     "gt5bloose_gt2medium_0PFfat"    : {
         "sel" : "(Nloosebtags > 5 && Nmediumbtags >2 && nprobejets == 0)",
-        "label" : "Resolved 3M 3L"
+        "label" : "Resolved 3M 3L",
+        "doSR" : "&& (h_fit_mass > 80 && h_fit_mass < 150)",
+        "doCR" : "&& !(h_fit_mass > 80 && h_fit_mass < 150)",
         },
     "gt5bloose_gt3medium_0PFfat"    : {
         "sel" : "(Nloosebtags > 5 && Nmediumbtags >3 && nprobejets == 0)",
-        "label" : "Resolved 4M 2L"
+        "label" : "Resolved 4M 2L",
+        "doSR" : "&& (h_fit_mass > 80 && h_fit_mass < 150)",
+        "doCR" : "&& !(h_fit_mass > 80 && h_fit_mass < 150)",
         },
     "gt5bloose_gt4medium_0PFfat"    : {
         "sel" : "(Nloosebtags > 5 && Nmediumbtags >4 && nprobejets == 0)",
-        "label" : "Resolved 5M 1L"
+        "label" : "Resolved 5M 1L",
+        "doSR" : "&& (h_fit_mass > 80 && h_fit_mass < 150)",
+        "doCR" : "&& !(h_fit_mass > 80 && h_fit_mass < 150)",
         },
     "gt5bmedium_0PFfat"             : {
         "sel" : "(Nmediumbtags > 5 && nprobejets == 0)",
-        "label" : "Resolved 6M"
+        "label" : "Resolved 6M",
+        "doSR" : "&& (h_fit_mass > 80 && h_fit_mass < 150)",
+        "doCR" : "&& !(h_fit_mass > 80 && h_fit_mass < 150)",
         },
     "1PFfat"                        : {
         "sel" : "(nprobejets == 1)",
-        "label" : "Boosted (1 PN fat jet)"
+        "label" : "Boosted (1 PN fat jet)",
+        "doSR" : "&& (fatJet1Mass > 80 && fatJet1Mass < 150)",
+        "doCR" : "&& !(fatJet1Mass > 80 && fatJet1Mass < 150)",
         },
     "gt1PFfat"                      : {
         "sel" : "(nprobejets > 1)",
-        "label" : "Boosted (> 1 PN fat jet)"
+        "label" : "Boosted (> 1 PN fat jet)",
+        "doSR" : "&& (fatJet1Mass > 80 && fatJet1Mass < 150)",
+        "doCR" : "&& !(fatJet1Mass > 80 && fatJet1Mass < 150)",
         },
     "gt0PFfat"                      : {
-        "sel" : "(nprobejets > 1)",
-        "label" : "Boosted (> 0 PN fat jet)"
+        "sel" : "(nprobejets > 0)",
+        "label" : "Boosted (> 0 PN fat jet)",
+        "doSR" : "&& (fatJet1Mass > 80 && fatJet1Mass < 150)",
+        "doCR" : "&& !(fatJet1Mass > 80 && fatJet1Mass < 150)",
         },
+    "1PNfatLoose"                        : {
+        "sel" : "(nprobejets == 1 && fatJet1PNetXbb > 0.95)",
+        "label" : "Boosted (1 PN fat jet) with PNet Xbb > 0.95",
+        "doSR" : "&& (fatJet1Mass > 80 && fatJet1Mass < 150)",
+        "doCR" : "&& !(fatJet1Mass > 80 && fatJet1Mass < 150)",
+        },
+    "gt1PNfatLoose"                      : {
+        "sel" : "(nprobejets > 1 && fatJet1PNetXbb > 0.95)",
+        "label" : "Boosted (> 1 PN fat jet) with PNet Xbb > 0.95",
+        "doSR" : "&& (fatJet1Mass > 80 && fatJet1Mass < 150)",
+        "doCR" : "&& !(fatJet1Mass > 80 && fatJet1Mass < 150)",
+        },
+    "1PNfatMedium"                        : {
+        "sel" : "(nprobejets == 1 && fatJet1PNetXbb > 0.975)",
+        "label" : "Boosted (1 PN fat jet) with PNet Xbb > 0.975",
+        "doSR" : "&& (fatJet1Mass > 80 && fatJet1Mass < 150)",
+        "doCR" : "&& !(fatJet1Mass > 80 && fatJet1Mass < 150)",
+        },
+    "gt1PNfatMedium"                      : {
+        "sel" : "(nprobejets > 1 && fatJet1PNetXbb > 0.975)",
+        "label" : "Boosted (> 1 PN fat jet) with PNet Xbb > 0.975",
+        "doSR" : "&& (fatJet1Mass > 80 && fatJet1Mass < 150)",
+        "doCR" : "&& !(fatJet1Mass > 80 && fatJet1Mass < 150)",
+        },
+    "1PNfatTight"                        : {
+        "sel" : "(nprobejets == 1 && fatJet1PNetXbb > 0.985)",
+        "label" : "Boosted (1 PN fat jet) with PNet Xbb > 0.985",
+        "doSR" : "&& (fatJet1Mass > 80 && fatJet1Mass < 150)",
+        "doCR" : "&& !(fatJet1Mass > 80 && fatJet1Mass < 150)",
+        },
+    "gt1PNfatTight"                      : {
+        "sel" : "(nprobejets > 1 && fatJet1PNetXbb > 0.985)",
+        "label" : "Boosted (> 1 PN fat jet) with PNet Xbb > 0.985",
+        "doSR" : "&& (fatJet1Mass > 80 && fatJet1Mass < 150)",
+        "doCR" : "&& !(fatJet1Mass > 80 && fatJet1Mass < 150)",
+        },
+
+
+
+
     ## you can add here categories with PN score
 }
 
 additional_selection = ""
 additional_label     = ""
-if do_SR :
-    additional_selection = " && (h_fit_mass > 80 && h_fit_mass < 150)"
+if do_SR : # done as attribute from the selections[selection]["doSR"] or selections[selection]["doCR"]
+    #additional_selection = " && (h_fit_mass > 80 && h_fit_mass < 150)"
     additional_label     = "SR"
 if do_CR :
-    additional_selection = " && !(h_fit_mass > 80 && h_fit_mass < 150)"
+    #additional_selection = " && !(h_fit_mass > 80 && h_fit_mass < 150)"
     additional_label     = "CR"
 
 # define function to run on mHHH
@@ -120,7 +181,8 @@ if not process_to_compute == 'none' :
     procstodo     = [process_to_compute]
     skip_do_plots = True
 
-for era in [2016, 2017, 2018] :
+#for era in [2016, 2017, 2018] :
+for era in [2018] :
     if str(era) in input_tree : year = str(era)
 
 wp_loose = wps_years['loose'][year]
@@ -134,6 +196,10 @@ for selection in selections.keys() :
           continue
 
   final_selection = selections[selection]["sel"]
+  if do_SR:
+      additional_selection = selections[selection]["doSR"]
+  elif do_CR:
+      additional_selection = selections[selection]["doCR"]
   if not additional_selection == "" :
       final_selection = "(%s %s)" % (selections[selection]["sel"], additional_selection)
 
@@ -174,7 +240,7 @@ for selection in selections.keys() :
         chunk_df = ROOT.RDataFrame(inputTree, proc)
 
         # add mHHH variable
-        chunk_df = addMHHH(chunk_df)
+        #chunk_df = addMHHH(chunk_df)
 
         entries_no_filter = int(chunk_df.Count().GetValue())
 
