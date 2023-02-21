@@ -287,11 +287,6 @@ for selection in selections.keys() :
     print("Will produce histograms for following variables:")
     print(do_limit_input)
     for var in variables: # booking all variables to be produced
-        """#print(type(var))
-        if "Resolved" in selections[selection]["label"] and "fatJet" in var :
-            continue"""
-
-
 
         template = ROOT.TH1F("", "", histograms_dict[do_limit_input]["nbins"], histograms_dict[do_limit_input]["xmin"], histograms_dict[do_limit_input]["xmax"])
 
@@ -335,7 +330,7 @@ for selection in selections.keys() :
             print("Seconds to load : ", seconds-seconds0)
             #print("Minutes to load : ", (seconds-seconds0)/60.0)
 
-  """if not skip_do_plots :
+  if not skip_do_plots :
       # Draw the data/MC to this selection
       command = "python3 draw_data_mc_categories.py --input_folder %s --plot_label '%s (%s)'" % (output_histos, selections[selection]["label"], additional_label)
       #if "0PFfat" in selection :
@@ -343,4 +338,4 @@ for selection in selections.keys() :
       print(command)
 
       proc=subprocess.Popen([command],shell=True,stdout=subprocess.PIPE)
-      out = proc.stdout.read()"""
+      out = proc.stdout.read()
