@@ -32,13 +32,13 @@ parser.add_option("--skip_do_plots", action="store_true", dest="skip_do_plots", 
 parser.add_option("--do_SR", action="store_true", dest="do_SR", help="Write...", default=False)
 parser.add_option("--do_CR", action="store_true", dest="do_CR", help="Write...", default=False)
 parser.add_option("--process ", type="string", dest="process_to_compute", help="Process to compute it. if no argument is given will do all", default='none')
-parser.add_option("--do_limit_tree ", type="string", dest="do_limit_tree", help="If given it will do the histograms only in that variable with all the uncertainties", default='none')
+parser.add_option("--do_limit_input ", type="string", dest="do_limit_input", help="If given it will do the histograms only in that variable with all the uncertainties", default='none')
 ## separate SR_CR as an option, this option would add _SR and _CR to the subfolder name
 ## add option to enter a process and if that is given to make the trees and histos only to it
 ## add option to add BDT computation here -- or not, we leave this only to MVA input variables -- the prefit plots already do data/MC
 (options, args) = parser.parse_args()
 
-do_limit_tree      = options.do_limit_tree ## X: to implement
+do_limit_input      = options.do_limit_input ## X: to implement
 process_to_compute = options.process_to_compute
 do_SR              = options.do_SR
 do_CR              = options.do_CR
@@ -276,76 +276,66 @@ for selection in selections.keys() :
     out = procs.stdout.read()
 
   if not skip_do_histograms : # args.doHistograms:
-   for proctodo in procstodo :
-    datahist = proctodo
-    if proctodo == "data_obs" :
-        if year == '2018' :
-            datahist = 'JetHT'
-        else:
-            datahist = 'BTagCSV'
-
-
-    outtree = "{}/{}_{}/{}.root".format(input_tree,selection,additional_label,proctodo) ## make better, to not have to call it twice
-
-    chunk_df = ROOT.RDataFrame(inputTree, outtree)
+    ## already doing plots, will do histogram file only to the chosen variable
     seconds0 = time.time()
-    # Define histograms to be produced
-    print(output_histos)
-    f_out = ROOT.TFile(output_histos + '/' + 'histograms_%s.root'%(proctodo), 'recreate')
-    print("Writing in %s"%(output_histos + '/' + 'histograms_%s.root'%(proctodo)))
-
-    histograms = []
+    #histograms = []
+    proctodo = "GluGluToHHHTo6B_SM" ## for taking the list of variables and doing the first histogram in the file
+    outtree = "{}/{}_{}/{}.root".format(input_tree,selection,additional_label,proctodo)
+    chunk_df = ROOT.RDataFrame(inputTree, outtree)
     variables = chunk_df.GetColumnNames()
-    if not len(variables) > 0 :
-        print("process %s has 0 entries, skipping doing the histogram" % proctodo)
-        continue
+
     print("Will produce histograms for following variables:")
-    print(variables)
-
-    # Rdataframes require first histogram to be produced and then the rest is nested in the loop of the first one
-    bins = histograms_dict['h_fit_mass']["nbins"]
-    xmin = histograms_dict['h_fit_mass']["xmin"]
-    xmax = histograms_dict['h_fit_mass']["xmax"]
-
-    print(bins,xmin,xmax)
-    h = chunk_df.Histo1D(("h_fit_mass","h_fit_mass",bins,xmin,xmax),"h_fit_mass", "totalWeight") # booking the rdataframe loop
-
-    # TH1DModel::TH1DModel(const char* name, const char* title, int nbinsx, double xlow, double xup)
-    h.SetTitle('h_fit_mass')
-    h.SetName('h_fit_mass')
-
-    histograms.append(h)
+    print(do_limit_input)
     for var in variables: # booking all variables to be produced
+        """#print(type(var))
         if "Resolved" in selections[selection]["label"] and "fatJet" in var :
-            continue
-        try :
-            histograms_dict[var]
-        except :
-            print("Skip doing histogram to %s, if you want to draw add the binning option in utils" % var)
-            continue
-        bins = histograms_dict[var]["nbins"]
-        xmin = histograms_dict[var]["xmin"]
-        xmax = histograms_dict[var]["xmax"]
-        char_var = var.c_str()
-        print(var,char_var,bins,xmin,xmax)
-        h_tmp = chunk_df.Histo1D((char_var,char_var,bins,xmin,xmax),var, "totalWeight")
-        h_tmp.SetTitle('%s'%(var))
-        h_tmp.SetName('%s'%(var))
-        if datahist == "GluGluToHHHTo6B_SM" :
-            h_tmp.Scale(10)
-        histograms.append(h_tmp)
-    h.Draw() # run one loop for all variables
+            continue"""
 
-    # writing output histograms
-    f_out.cd()
-    for h in histograms:
-        h.Write()
-    f_out.Close()
-    seconds = time.time()
-    print("Seconds to load : ", seconds-seconds0)
-    print("Minutes to load : ", (seconds-seconds0)/60.0)
 
-  if not skip_do_plots :
+
+        template = ROOT.TH1F("", "", histograms_dict[do_limit_input]["nbins"], histograms_dict[do_limit_input]["xmin"], histograms_dict[do_limit_input]["xmax"])
+
+        # Define histograms to be produced === make that can be a list
+        if do_limit_input == var :
+            try :
+                histograms_dict[do_limit_input]
+            except :
+                print("The binning options for the variable %s should be added in utils" % do_limit_input)
+                exit()
+
+            nameout = output_histos + '/' + 'histograms_%s.root'%(do_limit_input)
+            f_out = ROOT.TFile(nameout, 'recreate')
+            print("Writing in %s" % nameout)
+
+            f_out.cd()
+            for proctodo in procstodo :
+                outtree = "{}/{}_{}/{}.root".format(input_tree,selection,additional_label,proctodo) ## make better, to not have to call it twice
+
+                try :
+                    chunk_df = ROOT.RDataFrame(inputTree, outtree)
+                except :
+                    print("process %s has 0 entries, skipping doing the histogram" % proctodo)
+                    continue
+
+                datahist = proctodo
+                if proctodo == "data_obs" :
+                    if year == '2018' :
+                        datahist = 'JetHT'
+                    else:
+                        datahist = 'BTagCSV'
+
+                char_var = var.c_str()
+                h_tmp = chunk_df.Fill(template, [char_var, 'totalWeight'])
+                h_tmp.SetTitle('%s'%(proctodo))
+                h_tmp.SetName('%s'%(proctodo))
+                h_tmp.Write()
+
+            f_out.Close()
+            seconds = time.time()
+            print("Seconds to load : ", seconds-seconds0)
+            #print("Minutes to load : ", (seconds-seconds0)/60.0)
+
+  """if not skip_do_plots :
       # Draw the data/MC to this selection
       command = "python3 draw_data_mc_categories.py --input_folder %s --plot_label '%s (%s)'" % (output_histos, selections[selection]["label"], additional_label)
       #if "0PFfat" in selection :
@@ -353,4 +343,4 @@ for selection in selections.keys() :
       print(command)
 
       proc=subprocess.Popen([command],shell=True,stdout=subprocess.PIPE)
-      out = proc.stdout.read()
+      out = proc.stdout.read()"""
