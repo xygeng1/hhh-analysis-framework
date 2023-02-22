@@ -326,7 +326,7 @@ for selection in selections.keys() :
         proc_yield = chunk_df.Sum('totalWeight')
         print("Yield:", proc_yield.GetValue())
 
-        chunk_df.Snapshot(inputTree, outtree, variables + ['mva','totalWeight'])
+        chunk_df.Snapshot(inputTree, outtree, variables + ['totalWeight'])
 
         gc.collect() # clean menory
         sys.stdout.flush() # extra clean
@@ -352,8 +352,6 @@ for selection in selections.keys() :
 
     print("Will produce histograms for following variables:")
     print(do_limit_input)
-    print(proctodo)
-    #print(variables)
     for var in variables: # booking all variables to be produced
 
         template = ROOT.TH1F("", "", histograms_dict[do_limit_input]["nbins"], histograms_dict[do_limit_input]["xmin"], histograms_dict[do_limit_input]["xmax"])
@@ -388,7 +386,6 @@ for selection in selections.keys() :
                         datahist = 'BTagCSV'
 
                 char_var = var.c_str()
-                print(proctodo)
                 try:
                     h_tmp = chunk_df.Fill(template, [char_var, 'totalWeight'])
                     h_tmp.SetTitle('%s'%(proctodo))
@@ -397,7 +394,6 @@ for selection in selections.keys() :
  
                 except:
                     print("%s likely has 0 events"%proctodo)
-                    h_tmp = template.Clone()
 
             f_out.Close()
             seconds = time.time()
