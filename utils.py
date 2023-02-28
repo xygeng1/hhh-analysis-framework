@@ -138,6 +138,7 @@ histograms_dict = {
         'met'  : { "nbins" : 25 , "xmin" : 0 , "xmax" : 500, "label" : 'E_{T}^{miss} [GeV]'},
         'bdt'  : { "nbins" : 20 , "xmin" : -1 , "xmax" : 1, "label" : 'BDT output score'},
         'mva'  : { "nbins" : 20 , "xmin" : -0.6 , "xmax" : 0.8, "label" : 'BDT output score'},
+        'mvaBoosted'  : { "nbins" : 20 , "xmin" : -0.6 , "xmax" : 0.8, "label" : 'BDT output score (boosted)'},
 
         'jet1DeepFlavB'  : { "nbins" : 20 , "xmin" : 0 , "xmax" : 1, "label" : 'jet 1 DeepJet b-score'},
         'jet2DeepFlavB'  : { "nbins" : 20 , "xmin" : 0 , "xmax" : 1, "label" : 'jet 2 DeepJet b-score'},
@@ -232,10 +233,12 @@ def addLabel_CMS_preliminary(luminosity) :
 
 
 def clean_variables(variables) :
-    for testing in ["HLT", "LHE", "v_", "L1_", "l1PreFiringWeight", "trigger", "vbf", "lep",  "pu", "_Up", "_Down", 'passmetfilters', 'PSWeight', "boostedTau", "boostedTau_"] :
-        for var in variables :
-            if str(var).find(testing) != -1:
-                variables.remove(var)
+    #for testing in ["HLT", "LHE", "v_", "L1_", "l1PreFiringWeight", "trigger", "vbf", "lep",  "pu", "_Up", "_Down", 'passmetfilters', 'PSWeight', "boostedTau", "boostedTau_"] :
+    #    for var in variables :
+    #        if str(var).find(testing) != -1:
+    #            variables.remove(var)
+    ls_to_remove = ["HLT", "LHE", "v_", "L1_", "l1PreFiringWeight", "trigger", "vbf", "lep",  "pu", "_Up", "_Down", 'passmetfilters', 'PSWeight', "boostedTau", "boostedTau_"]
+    variables = [el for el in variables if not any(ext in el for ext in ls_to_remove)]
 
     # remove variables based on 6 first btags to not confuse
     for var in ['nloosebtags', 'nmediumbtags', 'ntightbtags'] :

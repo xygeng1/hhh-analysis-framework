@@ -19,12 +19,13 @@ import gc
 #import tdrstyle,CMS_lumi
 
 ROOT.gROOT.SetBatch(ROOT.kTRUE)
+ROOT.ROOT.EnableImplicitMT()
 
 from utils import histograms_dict, wps_years, wps, tags, luminosities, hlt_paths, triggersCorrections, add_bdt, bdts_xml, hist_properties, init_mhhh, addMHHH, clean_variables
 
 from optparse import OptionParser
 parser = OptionParser()
-parser.add_option("--base_folder ", type="string", dest="base", help="Folder in where to look for the categories", default='/isilon/data/users/mstamenk/eos-triple-h/v25/mva-inputs-HLT-boosted-bdt-v25-inclusive-loose-wp-0ptag-2018/')
+parser.add_option("--base_folder ", type="string", dest="base", help="Folder in where to look for the categories", default='/isilon/data/users/mstamenk/eos-triple-h/v25/mva-boosted-cut-2018/')
 parser.add_option("--category ", type="string", dest="category", help="Category to compute it. if no argument is given will do all", default='none')
 parser.add_option("--skip_do_trees", action="store_true", dest="skip_do_trees", help="Write...", default=False)
 parser.add_option("--skip_do_histograms", action="store_true", dest="skip_do_histograms", help="Write...", default=False)
@@ -155,10 +156,30 @@ selections = {
         "doSR" : "&& (fatJet1Mass > 80 && fatJet1Mass < 150)",
         "doCR" : "&& !(fatJet1Mass > 80 && fatJet1Mass < 150)",
         },
-
-
-
-
+    "gt0PFfat_cat1"                      : {
+        "sel" : "(nprobejets > 0 && mvaBoosted[0] > 0.4 && fatJet1PNetXbb > 0.985)",
+        "label" : "Boosted category 1",
+        "doSR" : "&& (fatJet1Mass > 0)",
+        "doCR" : "&& !(fatJet1Mass > 80 && fatJet1Mass < 150)",
+        },
+    "gt0PFfat_cat2"                      : {
+        "sel" : "(nprobejets > 0 && mvaBoosted[0] > 0.15 && mvaBoosted[0] < 0.4 && fatJet1PNetXbb > 0.985)",
+        "label" : "Boosted category 2",
+        "doSR" : "&& (fatJet1Mass > 0)",
+        "doCR" : "&& !(fatJet1Mass > 80 && fatJet1Mass < 150)",
+        },
+    "gt0PFfat_cat3"                      : {
+        "sel" : "(nprobejets > 0 && mvaBoosted[0] > -0.04 && mvaBoosted < 0.4 && && fatJet1PNetXbb > 0.95)",
+        "label" : "Boosted category 3",
+        "doSR" : "&& (fatJet1Mass > 0)",
+        "doCR" : "&& !(fatJet1Mass > 80 && fatJet1Mass < 150)",
+        },
+    "gt0PFfat_cat4"                      : {
+        "sel" : "(nprobejets > 0 && mvaBoosted[0] > -0.04 && && fatJet1PNetXbb < 0.95)",
+        "label" : "Boosted category 4",
+        "doSR" : "&& (fatJet1Mass > 0)",
+        "doCR" : "&& !(fatJet1Mass > 80 && fatJet1Mass < 150)",
+        },
     ## you can add here categories with PN score
 }
 
@@ -285,8 +306,8 @@ for selection in selections.keys() :
                     obj = '{}{}{}'.format(type_obj,jet_number,angle)
                     if obj in variables :
                         #print("Take absolute of %s" % obj)
-                        chunk_df = chunk_df.Redefine(obj, "abs(%s)" % obj)
-                chunk_df = chunk_df.Redefine('hhh_eta', "abs(hhh_eta)")
+                        chunk_df = chunk_df.Define('Abs%s'%obj, "abs(%s)" % obj)
+        chunk_df = chunk_df.Define('Abshhh_eta', "abs(hhh_eta)")
                 #chunk_df = chunk_df.Redefine('hh_phi', "abs(hh_phi)")
 
         print("2 - construct the eventWeight")
@@ -326,7 +347,7 @@ for selection in selections.keys() :
         proc_yield = chunk_df.Sum('totalWeight')
         print("Yield:", proc_yield.GetValue())
 
-        chunk_df.Snapshot(inputTree, outtree, variables + ['totalWeight'])
+        chunk_df.Snapshot(inputTree, outtree, variables + ['totalWeight','mvaBoosted','mva'])
 
         gc.collect() # clean menory
         sys.stdout.flush() # extra clean
@@ -350,14 +371,18 @@ for selection in selections.keys() :
     chunk_df = ROOT.RDataFrame(inputTree, outtree)
     variables = chunk_df.GetColumnNames()
 
+
     print("Will produce histograms for following variables:")
     print(do_limit_input)
     for var in variables: # booking all variables to be produced
 
-        template = ROOT.TH1F("", "", histograms_dict[do_limit_input]["nbins"], histograms_dict[do_limit_input]["xmin"], histograms_dict[do_limit_input]["xmax"])
-
+        #template = ROOT.TH1F("", "", histograms_dict[do_limit_input]["nbins"], histograms_dict[do_limit_input]["xmin"], histograms_dict[do_limit_input]["xmax"])
         # Define histograms to be produced === make that can be a list
         if do_limit_input == var :
+            nbins = histograms_dict[do_limit_input]["nbins"]
+            xmin = histograms_dict[do_limit_input]["xmin"]
+            xmax = histograms_dict[do_limit_input]["xmax"]
+
             try :
                 histograms_dict[do_limit_input]
             except :
@@ -387,11 +412,13 @@ for selection in selections.keys() :
 
                 char_var = var.c_str()
                 try:
-                    h_tmp = chunk_df.Fill(template, [char_var, 'totalWeight'])
+                    #h_tmp = chunk_df.Fill(template, [char_var, 'totalWeight'])
+                    f_out.cd()
+                    h_tmp = chunk_df.Histo1D((char_var,char_var,nbins,xmin,xmax),char_var, 'totalWeight')
                     h_tmp.SetTitle('%s'%(proctodo))
                     h_tmp.SetName('%s'%(proctodo))
                     h_tmp.Write()
- 
+
                 except:
                     print("%s likely has 0 events"%proctodo)
 
@@ -402,7 +429,7 @@ for selection in selections.keys() :
 
   if not skip_do_plots :
       # Draw the data/MC to this selection
-      command = "python3 draw_data_mc_categories.py --input_folder %s --plot_label '%s (%s)'" % (output_histos, selections[selection]["label"], additional_label)
+      command = "python3 draw_data_mc_categories.py --input_folder %s --plot_label '%s (%s)'" % (output_histos.replace('histograms',''), selections[selection]["label"], additional_label)
       #if "0PFfat" in selection :
       #command = command + " --log"
       print(command)

@@ -5,12 +5,13 @@ from utils import histograms_dict, hist_properties, addLabel_CMS_preliminary, lu
 
 import ROOT
 
-ROOT.PyConfig.IgnoreCommandLineOptions = True
-ROOT.gROOT.CloseFiles()
-ROOT.gROOT.ProcessLine("gErrorIgnoreLevel = 2000;")
-ROOT.gROOT.SetMustClean(True)
+#ROOT.PyConfig.IgnoreCommandLineOptions = True
+#ROOT.gROOT.CloseFiles()
+#ROOT.gROOT.ProcessLine("gErrorIgnoreLevel = 2000;")
+#ROOT.gROOT.SetMustClean(True)
 ROOT.gStyle.SetOptStat("0")
 ROOT.gROOT.SetBatch(ROOT.kTRUE)
+ROOT.ROOT.EnableImplicitMT()
 
 from optparse import OptionParser
 parser = OptionParser()
@@ -34,19 +35,12 @@ output_folder=options.output_folder
 if output_folder == "none" :
     output_folder = input_folder
 
-for era in ['2016APV', '2016' '2017', '2018' ] :
-    if era in input_folder.split("/") : year = era
+for era in ['2016APV', '2016', '2017', '2018' ] :
+    if era in input_folder : year = era
 
 labels = addLabel_CMS_preliminary(luminosities[year])
 
 iPeriod = 0
-c = ROOT.TCanvas()
-c.SetCanvasSize(600, 700)
-#c.SetBorderMode(0)
-#c.SetTopMargin(0.5)
-p1 = ROOT.TPad("c_1","",0,0,1,0.3)
-p2 = ROOT.TPad("c_2","", 0,0.3,1,0.95)
-
 datahist   = 'data_obs'
 signalhist = 'GluGluToHHHTo6B_SM'
 inputTree = 'Events'
@@ -73,6 +67,13 @@ else :
     ypos     = 0.9
 
 for var in variables:
+    canvas = ROOT.TCanvas()
+    canvas.SetCanvasSize(600, 700)
+    #c.SetBorderMode(0)
+    #c.SetTopMargin(0.5)
+    p1 = ROOT.TPad("c_1","",0,0,1,0.3)
+    p2 = ROOT.TPad("c_2","", 0,0.3,1,0.95)
+
     if "Resolved" in plot_label and "fatJet" in var :
         continue
 
@@ -91,6 +92,9 @@ for var in variables:
         continue
 
     template = ROOT.TH1F("", "", histograms_dict[var]["nbins"], histograms_dict[var]["xmin"], histograms_dict[var]["xmax"])
+    nbins = histograms_dict[var]["nbins"]
+    xmin = histograms_dict[var]["xmin"]
+    xmax = histograms_dict[var]["xmax"]
     char_var = var.c_str()
     #file_data = ROOT.TFile(input_folder + '/' + 'histograms_%s.root'%(datahist))
     #file_signal = ROOT.TFile(input_folder + '/' + 'histograms_%s.root'%('GluGluToHHHTo6B_SM'))
@@ -105,8 +109,11 @@ for var in variables:
     legend = ROOT.TLegend(0.62,0.65,.95,0.9)
     legend.SetBorderSize(0)
 
-    h_data = template.Clone()
-    h_data = chunk_data.Fill(template, [char_var])
+    #h_data = template.Clone()
+    #h_data = chunk_data.Fill(template, [char_var])
+    h_data = chunk_data.Histo1D((char_var,char_var,nbins,xmin,xmax),char_var)
+    h_data.Draw()
+    h_data = h_data.GetValue()
     h_data.SetTitle(hist_properties[datahist][3])
     h_data.SetName(hist_properties[datahist][3])
     #h_data = file_data.Get(var)
@@ -117,7 +124,7 @@ for var in variables:
     h_data.SetStats(0)
     h_data.GetXaxis().SetTitle(histograms_dict[var]["label"])
     h_data.SetTitle('')
-    legend.AddEntry( h_data.GetPtr(), h_data.GetName())
+    legend.AddEntry( h_data, h_data.GetName())
 
     if do_log :
         ymax      = 1000000.0*h_data.GetMaximum()
@@ -125,21 +132,24 @@ for var in variables:
         ymax      = 1.5*h_data.GetMaximum()
 
     # blinding
-    if 'mass' in var:
+    if 'mass' in var or 'Mass' in var:
         for mass_value in [110,120,130]:
             bin_m = h_data.FindBin(mass_value)
             h_data.SetBinContent(bin_m,-3.0000001)
             h_data.SetBinError(bin_m,-3.0)
 
-    if 'bdt' in var:
+    if 'bdt' in var or 'mva' in var:
         blind_bdt = [x*0.05 + 0.5 for x in range(20)]
         for value in blind_bdt:
             bin_blind = h_data.FindBin(value)
             h_data.SetBinContent(bin_blind,-3.0000001)
             h_data.SetBinError(bin_m,0)
 
-    h_signal = template.Clone()
-    h_signal = chunk_signal.Fill(template, [char_var, 'totalWeight'])
+    #h_signal = template.Clone()
+    #h_signal = chunk_signal.Fill(template, [char_var, 'totalWeight'])
+    h_signal = chunk_signal.Histo1D((char_var,char_var,nbins,xmin,xmax),char_var, 'totalWeight')
+    h_signal.Draw()
+    h_signal = h_signal.GetValue()
     #h_signal = file_signal.Get(var)
     h_signal.SetDirectory(0)
     h_signal.SetMarkerColor(hist_properties[signalhist][0])
@@ -151,7 +161,7 @@ for var in variables:
     if not scale_sig == 1.0 :
         label_sig =  "%s (X %s)" % (label_sig, str(scale_sig))
     #legend.AddEntry(h_signal, label_sig, 'l')
-    legend.AddEntry(h_signal.GetPtr(), label_sig, 'l')
+    legend.AddEntry(h_signal, label_sig, 'l')
 
     h_stack = ROOT.THStack()
 
@@ -160,25 +170,37 @@ for var in variables:
     h_bkg.SetTitle('%s_bkg'%(var))
     h_bkg.SetName('%s_bkg'%(var))
 
+    histograms_bkg = {} # need to save histograms outside of for loop other wise seg fault
+
     for bkg in files_bkg:
+
+        f_tmp = ROOT.TFile(files_bkg[bkg])
+        if 'Events' not in f_tmp.GetListOfKeys():
+            f_tmp.Close()
+            continue
+        f_tmp.Close()
         chunk_bkg   = ROOT.RDataFrame(inputTree, files_bkg[bkg])
-        h_tmp       = chunk_bkg.Fill(template, [char_var, 'totalWeight'])
+        print(inputTree, files_bkg[bkg])
+        #h_tmp       = chunk_bkg.Fill(template, [char_var, 'totalWeight'])
+        h_tmp = chunk_bkg.Histo1D((char_var,char_var,nbins,xmin,xmax),char_var, 'totalWeight')
+        h_tmp = h_tmp.GetValue()
+        histograms_bkg[bkg ] = h_tmp
 
         try:
             h_tmp.SetDirectory(0)
         except:
             continue
 
-        dumb = h_bkg.Add(h_tmp.GetPtr())
-        del dumb
+        h_tmp.Draw()
+
+        h_bkg.Add(h_tmp)
 
         h_tmp.SetFillColor(hist_properties[bkg][0])
         h_tmp.SetMarkerSize(hist_properties[bkg][1])
         if hist_properties[bkg][4]:
-            legend.AddEntry(h_tmp.GetPtr(), hist_properties[bkg][3], 'f')
+            legend.AddEntry(h_tmp, hist_properties[bkg][3], 'f')
         print("adding to stack", bkg)
-        dumb = h_stack.Add(h_tmp.GetPtr())
-        del dumb
+        h_stack.Add(h_tmp)
 
     maxi = max(h_data.GetMaximum(), h_bkg.GetMaximum())
 
@@ -211,11 +233,10 @@ for var in variables:
     h_data.GetXaxis().SetLabelOffset(999)
     h_data.GetXaxis().SetLabelSize(0)
     print("opening canvas")
-    c.cd()
+    canvas.cd()
     print("drawing pads")
-    dumb = p1.Draw()
-    dumb = p2.Draw()
-    del dumb
+    p1.Draw()
+    p2.Draw()
     print("setting pads")
     p1.SetBottomMargin(0.3)
     p1.SetTopMargin(0.05)
@@ -228,57 +249,40 @@ for var in variables:
     h_data.SetMaximum(ymax)
 
     print("opening pads")
-    gPad = p2.cd()
+    p2.cd()
     if do_log :
-        gPad.SetLogy()
+        p2.SetLogy()
 
     print("drawing histograms in upper  pads")
-    dumb = h_data.Draw('e')
-    dumb = h_stack.Draw('hist e same')
-    dumb = h_signal.Draw('hist e same')
-    dumb = h_data.Draw('e same')
-    dumb = legend.Draw()
+    h_data.Draw('e')
+    h_stack.Draw('hist e same')
+    h_signal.Draw('hist e same')
+    h_data.Draw('e same')
+    legend.Draw()
 
     print("adding text")
     plot_label_tpave = ROOT.TText(xpos , ypos*ymax, plot_label)
     plot_label_tpave.SetTextAlign(11)
     plot_label_tpave.SetTextSize(0.04)
-    dumb = plot_label_tpave.Draw()
+    plot_label_tpave.Draw()
 
     for ll, label in enumerate(labels):
-        dumb = label.Draw("same")
-        del dumb
+        label.Draw("same")
 
     # plot_label
     print("drawing histograms in down  pads")
 
     p1.cd()
     p1.SetGridy()
-    dumb = h_div.Draw('e')
-    dumb = h_mc_stat.Draw('e2 same')
-    c.cd()
+    h_div.Draw('e')
+    h_mc_stat.Draw('e2 same')
+    #canvas.cd()
     print("drawing histograms in down  pads done")
 
-
-    #c.Update()
-    #print("updated canvas")
-    #c.RedrawAxis()
-    #print("redrawing canvas")
-
     plot_file = "%s/%s" % (output_folder,str(var))
-    # var is 'cppyy.CPPExcInstance'
     if save_pdf :
-        c.Print("%s/%s" % (plot_file, '.pdf') ) # save PDF only when we need to add to docs
-    dumb = c.Print("%s/%s" % (plot_file, '.png'))
-    del dumb
+        canvas.Print("%s%s" % (plot_file, '.pdf') ) # save PDF only when we need to add to docs
+    canvas.Print("%s%s" % (plot_file, '.png'))
+
     print("did %s" % plot_file)
 
-    bottomPad.IsA().Destructor(bottomPad)
-    c.Flush()
-    topPad.IsA().Destructor(topPad)
-    c.IsA().Destructor(canvas)
-
-    #file_data.Close()
-    #file_signal.Close()
-    #for fi in files_bkg:
-    #    files_bkg[fi].Close()
