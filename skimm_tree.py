@@ -347,7 +347,7 @@ for selection in selections.keys() :
         proc_yield = chunk_df.Sum('totalWeight')
         print("Yield:", proc_yield.GetValue())
 
-        chunk_df.Snapshot(inputTree, outtree, variables + ['totalWeight','mvaBoosted','mva'])
+        chunk_df.Snapshot(inputTree, outtree, variables + ['totalWeight'])
 
         gc.collect() # clean menory
         sys.stdout.flush() # extra clean
