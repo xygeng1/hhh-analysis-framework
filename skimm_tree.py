@@ -261,7 +261,7 @@ for selection in selections.keys() :
         chunk_df = ROOT.RDataFrame(inputTree, proc)
 
         # add mHHH variable
-        #chunk_df = addMHHH(chunk_df)
+        chunk_df = addMHHH(chunk_df)
 
         entries_no_filter = int(chunk_df.Count().GetValue())
 
@@ -294,7 +294,7 @@ for selection in selections.keys() :
         variables = clean_variables(variables)
         ## if to do limit the cleaning will be different
         print("Cleaned variables", len(variables))
-        print(variables)
+        #print(variables)
         ## cleaning is not working for all variables, even if explicitelly asking to remove all that name, and for some not cleaned variables will given
         ## Error in <TBranch::TBranch>: Illegal leaf: LHEReweightingWeight/LHEReweightingWeight[nLHEReweightingWeight]/F. If this is a variable size C array it's possible that the branch holding the size is not available
         ## Maybe because I do not source CMSSW
@@ -346,6 +346,8 @@ for selection in selections.keys() :
 
         proc_yield = chunk_df.Sum('totalWeight')
         print("Yield:", proc_yield.GetValue())
+
+        print(variables)
 
         chunk_df.Snapshot(inputTree, outtree, variables + ['totalWeight'])
 

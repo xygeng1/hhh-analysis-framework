@@ -248,7 +248,7 @@ def clean_variables(variables) :
         try :
             variables.remove(var)
         except:
-            1 == 1
+            pass
 
     for hhhvar in ['hhh_resolved_mass', 'hhh_resolved_pt', 'hhh_t3_pt', 'hhh_mass', 'hhh_pt', "hh_eta", "hh_mass", "hh_phi", "hh_pt", "hhh_eta", "hhh_phi",] :
         #print("removed %s" % hhhvar)
@@ -264,14 +264,14 @@ def clean_variables(variables) :
             try :
                 variables.remove('jet{}{}'.format(jet_number,jetvar))
             except:
-                1 == 1
+                pass
 
     for jet_number in range(1,7) :
         for jetvar in ['DeepFlavB', 'BTagSF', 'TightTTWeight', 'MediumTTWeight', 'LooseTTWeight', 'HiggsMatched', 'HasMuon', 'HasElectron', 'FatJetMatched', 'HiggsMatchedIndex', 'MatchedGenPt', 'JetId', 'PuId', 'HadronFlavour', 'FatJetMatchedIndex', 'RawFactor'] :
             try :
                 variables.remove('bcand{}{}'.format(jet_number,jetvar))
             except:
-                1 == 1
+                pass
 
     for jet_number in range(1,4) :
         variables.remove('h{}_t3_match'.format(jet_number))
@@ -285,7 +285,15 @@ def clean_variables(variables) :
             try :
                 variables.remove('fatJet{}{}'.format(jet_number,fatvar))
             except:
-                1 == 1
+                pass
+        
+    for hhhvar in ['hhh_resolved_mass', 'hhh_resolved_pt', 'hhh_t3_pt', 'hhh_mass', 'hhh_pt', "hh_eta", "hh_mass", "hh_phi", "hh_pt", "hhh_eta", "hhh_phi",] :
+        #print("removed %s" % hhhvar)
+        try :
+            variables.remove(hhhvar)
+        except:
+            pass
+
     return variables
 
 
@@ -536,7 +544,7 @@ def add_bdt(df, year):
     return df
 
 computeMHHH = '''
-    float computeMHHH(float h1_t3_mass, float h1_t3_pt, float h1_t3_eta, float h1_t3_phi,float h2_t3_mass, float h2_t3_pt, float h2_t3_eta, float h2_t3_phi, float h3_t3_mass, float h3_t3_pt, float h3_t3_eta, float h3_t3_phi) {
+    float computeMHHH(int type, float h1_t3_mass, float h1_t3_pt, float h1_t3_eta, float h1_t3_phi,float h2_t3_mass, float h2_t3_pt, float h2_t3_eta, float h2_t3_phi, float h3_t3_mass, float h3_t3_pt, float h3_t3_eta, float h3_t3_phi) {
         TLorentzVector h1;
         TLorentzVector h2;
         TLorentzVector h3;
@@ -545,7 +553,13 @@ computeMHHH = '''
         h2.SetPtEtaPhiM(h2_t3_pt, h2_t3_eta, h2_t3_phi, h2_t3_mass);
         h3.SetPtEtaPhiM(h3_t3_pt, h3_t3_eta, h3_t3_phi, h3_t3_mass);
 
-        return (h1+h2+h3).M();
+        if (type == 0)
+            return (h1+h2+h3).M();
+        else if (type == 1)
+            return (h1+h2+h3).Pt();
+        else if (type == 2)
+            return (h1+h2+h3).Eta();
+        else return 0;
     }
 
 '''
@@ -554,7 +568,10 @@ def init_mhhh():
     ROOT.gInterpreter.Declare(computeMHHH)
 
 def addMHHH(df):
-    df = df.Define('mHHH', 'computeMHHH(h1_t3_mass,h1_t3_pt,h1_t3_eta,h1_t3_phi,h2_t3_mass,h2_t3_pt,h2_t3_eta,h2_t3_phi,h3_t3_mass,h3_t3_pt,h3_t3_eta,h3_t3_phi)')
+    #df = df.Define('mHHH', 'computeMHHH(h1_t3_mass,h1_t3_pt,h1_t3_eta,h1_t3_phi,h2_t3_mass,h2_t3_pt,h2_t3_eta,h2_t3_phi,h3_t3_mass,h3_t3_pt,h3_t3_eta,h3_t3_phi)')
+    df = df.Define('HHH_mass', 'computeMHHH(0, h1_t3_mass,h1_t3_pt,h1_t3_eta,h1_t3_phi,h2_t3_mass,h2_t3_pt,h2_t3_eta,h2_t3_phi,h3_t3_mass,h3_t3_pt,h3_t3_eta,h3_t3_phi)')
+    df = df.Define('HHH_pt', 'computeMHHH(1, h1_t3_mass,h1_t3_pt,h1_t3_eta,h1_t3_phi,h2_t3_mass,h2_t3_pt,h2_t3_eta,h2_t3_phi,h3_t3_mass,h3_t3_pt,h3_t3_eta,h3_t3_phi)')
+    df = df.Define('HHH_eta', 'computeMHHH(2, h1_t3_mass,h1_t3_pt,h1_t3_eta,h1_t3_phi,h2_t3_mass,h2_t3_pt,h2_t3_eta,h2_t3_phi,h3_t3_mass,h3_t3_pt,h3_t3_eta,h3_t3_phi)')
     return df
 
 def drawText(x, y, text, color = ROOT.kBlack, fontsize = 0.05, font = 42, doNDC = True, alignment = 12):
