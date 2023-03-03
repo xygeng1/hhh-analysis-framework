@@ -2,8 +2,8 @@
 
 import os, ROOT
 
-#root_path = os.environ['MYROOT']
-root_path = '/isilon/data/users/mstamenk/hhh-6b-producer/master/CMSSW_12_5_2/src/hhh-master/hhh-analysis-framework/'
+root_path = os.environ['MYROOT']
+#root_path = '/isilon/data/users/mstamenk/hhh-6b-producer/master/CMSSW_12_5_2/src/hhh-master/hhh-analysis-framework/'
 
 path_bdt_xml = '%s/data/bdt/'%(root_path)
 

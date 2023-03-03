@@ -5,13 +5,6 @@ import ROOT
 import correctionlib
 correctionlib.register_pyroot_binding()
 
-def btag_init(year):
-    sfDir = '/isilon/data/users/mstamenk/hhh-6b-producer/CMSSW_12_5_2/src/jsonpog-integration/POG/BTV/%s_UL/btagging.json.gz'%year
-    ROOT.gInterpreter.Declare('auto btvjson = correction::CorrectionSet::from_file("%s");'%sfDir)
-    ROOT.gInterpreter.Declare('auto btvjson_shape = btvjson->at("deepJet_shape");')
-    ROOT.gInterpreter.Declare('auto btvjson_comb = btvjson->at("deepJet_comb");') # bc
-    ROOT.gInterpreter.Declare('auto btvjson_incl = btvjson->at("deepJet_incl");') # light
-
 
 
 def addBTagSF(df, f_in): # shape scale factors for MVA
@@ -68,6 +61,16 @@ computeTightBTAGSF = '''
     }
 '''
 
+def btag_init(year):
+    sfDir = '/isilon/data/users/mstamenk/hhh-6b-producer/CMSSW_12_5_2/src/jsonpog-integration/POG/BTV/%s_UL/btagging.json.gz'%year
+    ROOT.gInterpreter.Declare('auto btvjson = correction::CorrectionSet::from_file("%s");'%sfDir)
+    ROOT.gInterpreter.Declare('auto btvjson_shape = btvjson->at("deepJet_shape");')
+    ROOT.gInterpreter.Declare('auto btvjson_comb = btvjson->at("deepJet_comb");') # bc
+    ROOT.gInterpreter.Declare('auto btvjson_incl = btvjson->at("deepJet_incl");') # light
+    ROOT.gInterpreter.Declare(computeLooseBTAGSF)
+    ROOT.gInterpreter.Declare(computeMediumBTAGSF)
+    ROOT.gInterpreter.Declare(computeTightBTAGSF)
+
 
 
 def addBTagEffSF(df,f_in,wp):
@@ -96,15 +99,12 @@ def addBTagEffSF(df,f_in,wp):
             df = df.Define('jet6TightBTagEffSF', '1')
     else: 
         if wp == 'loose':
-            ROOT.gInterpreter.Declare(computeLooseBTAGSF)
             name = 'LooseBTagEffSF'
             script = 'computeLooseBTagsEffSFPerFlavour'
         elif wp == 'medium':
-            ROOT.gInterpreter.Declare(computeMediumBTAGSF)
             name = 'MediumBTagEffSF'
             script = 'computeMediumBTagsEffSFPerFlavour'
         elif wp == 'tight':
-            ROOT.gInterpreter.Declare(computeTightBTAGSF)
             name = 'TightBTagEffSF'
             script = 'computeTightBTagsEffSFPerFlavour'
         df = df.Define('jet1%s'%name, "%s(int(round(jet1HadronFlavour)),std::abs(jet1Eta),jet1Pt)"%script)
