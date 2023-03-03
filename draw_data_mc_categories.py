@@ -63,7 +63,7 @@ if do_log :
     scale_sig = 1.0
     ypos     = 0.095
 else :
-    scale_sig = 5000.0
+    scale_sig = 350.0
     ypos     = 0.9
 
 for var in variables:
@@ -74,8 +74,8 @@ for var in variables:
     p1 = ROOT.TPad("c_1","",0,0,1,0.3)
     p2 = ROOT.TPad("c_2","", 0,0.3,1,0.95)
 
-    if "Resolved" in plot_label and "fatJet" in var :
-        continue
+    #if "Resolved" in plot_label and "fatJet" in var :
+    #    continue
 
     try :
         histograms_dict[var]
@@ -100,7 +100,7 @@ for var in variables:
     #file_signal = ROOT.TFile(input_folder + '/' + 'histograms_%s.root'%('GluGluToHHHTo6B_SM'))
 
     files_bkg = {}
-    for bkg in ['ZZZ','WWW','WZZ','ZZTo4Q', 'WWTo4Q', 'WWTo4Q','ZJetsToQQ', 'WJetsToQQ', 'TT', 'QCD6B', 'QCD']:
+    for bkg in ['ZZZ','WWW','WZZ','ZZTo4Q', 'WWTo4Q', 'WWTo4Q','ZJetsToQQ', 'WJetsToQQ', 'TTToHadronic','TTToSemiLeptonic', 'QCD']:
         #f_tmp = ROOT.TFile(input_folder + '/' + 'histograms_%s.root'%bkg)
         f_tmp = "{}/{}.root".format(input_folder, bkg)
         if os.path.exists(f_tmp) :
@@ -129,21 +129,21 @@ for var in variables:
     if do_log :
         ymax      = 1000000.0*h_data.GetMaximum()
     else :
-        ymax      = 1.5*h_data.GetMaximum()
+        ymax      = 2.0*h_data.GetMaximum()
 
     # blinding
-    if 'mass' in var or 'Mass' in var:
+    if 'mass' in str(var) or 'Mass' in str(var):
         for mass_value in [110,120,130]:
             bin_m = h_data.FindBin(mass_value)
-            h_data.SetBinContent(bin_m,-3.0000001)
-            h_data.SetBinError(bin_m,-3.0)
+            h_data.SetBinContent(bin_m,-100000.0000001)
+            h_data.SetBinError(bin_m,-100000.0)
 
-    if 'bdt' in var or 'mva' in var:
+    if 'bdt' in str(var) or 'mva' in str(var):
         blind_bdt = [x*0.05 + 0.5 for x in range(20)]
         for value in blind_bdt:
             bin_blind = h_data.FindBin(value)
             h_data.SetBinContent(bin_blind,-3.0000001)
-            h_data.SetBinError(bin_m,0)
+            h_data.SetBinError(bin_blind,0)
 
     #h_signal = template.Clone()
     #h_signal = chunk_signal.Fill(template, [char_var, 'totalWeight'])

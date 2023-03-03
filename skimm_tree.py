@@ -21,11 +21,13 @@ import gc
 ROOT.gROOT.SetBatch(ROOT.kTRUE)
 ROOT.ROOT.EnableImplicitMT()
 
-from utils import histograms_dict, wps_years, wps, tags, luminosities, hlt_paths, triggersCorrections, add_bdt, bdts_xml, hist_properties, init_mhhh, addMHHH, clean_variables
+from utils import histograms_dict, wps_years, wps, tags, luminosities, hlt_paths, triggersCorrections, hist_properties, init_mhhh, addMHHH, clean_variables, initialise_df, save_variables
+from machinelearning import init_bdt, add_bdt, init_bdt_boosted, add_bdt_boosted
+from calibrations import btag_init, addBTagSF, addBTagEffSF
 
 from optparse import OptionParser
 parser = OptionParser()
-parser.add_option("--base_folder ", type="string", dest="base", help="Folder in where to look for the categories", default='/isilon/data/users/mstamenk/eos-triple-h/v25/mva-boosted-cut-2018/')
+parser.add_option("--base_folder ", type="string", dest="base", help="Folder in where to look for the categories", default='/eos/user/m/mstamenk/CxAOD31run/hhh-6b/v26/2018/')
 parser.add_option("--category ", type="string", dest="category", help="Category to compute it. if no argument is given will do all", default='none')
 parser.add_option("--skip_do_trees", action="store_true", dest="skip_do_trees", help="Write...", default=False)
 parser.add_option("--skip_do_histograms", action="store_true", dest="skip_do_histograms", help="Write...", default=False)
@@ -56,129 +58,203 @@ if do_SR and do_CR :
 selections = {
     #"final_selection_jetMultiplicity" : "(nbtags > 4 && nfatjets == 0) || (nbtags > 2 && nfatjets > 0)",
     "gt5bloose_test"                : {
-        "sel" : "(Nloosebtags > 5 )",
-        "label" : "6L"
+        "sel" : "(nloosebtags > 5 )",
+        "label" : "6L",
+        "dataset" : "resolved",
         },
     "gt5bloose_0PFfat"              : {
-        "sel" : "(Nloosebtags > 5 && nprobejets == 0)",
+        "sel" : "(nloosebtags > 5 && nprobejets == 0)",
         "label" : "Resolved 6L",
         "doSR" : "&& (h_fit_mass > 80 && h_fit_mass < 150)",
         "doCR" : "&& !(h_fit_mass > 80 && h_fit_mass < 150)",
+        "dataset" : "resolved",
 
         },
     "gt5bloose_gt0medium_0PFfat"    : {
-        "sel" : "(Nloosebtags > 5 && Nmediumbtags >0 && nprobejets == 0)",
+        "sel" : "(nloosebtags > 5 && nmediumbtags >0 && nprobejets == 0)",
         "label" : "Resolved 1M 5L",
         "doSR" : "&& (h_fit_mass > 80 && h_fit_mass < 150)",
         "doCR" : "&& !(h_fit_mass > 80 && h_fit_mass < 150)",
+        "dataset" : "resolved",
         },
     "gt5bloose_gt1medium_0PFfat"    : {
-        "sel" : "(Nloosebtags > 5 && Nmediumbtags >1 && nprobejets == 0)",
+        "sel" : "(nloosebtags > 5 && nmediumbtags >1 && nprobejets == 0)",
         "label" : "Resolved 2M 4L",
         "doSR" : "&& (h_fit_mass > 80 && h_fit_mass < 150)",
         "doCR" : "&& !(h_fit_mass > 80 && h_fit_mass < 150)",
+        "dataset" : "resolved",
         },
     "gt5bloose_gt2medium_0PFfat"    : {
-        "sel" : "(Nloosebtags > 5 && Nmediumbtags >2 && nprobejets == 0)",
+        "sel" : "(nloosebtags > 5 && nmediumbtags >2 && nprobejets == 0)",
         "label" : "Resolved 3M 3L",
         "doSR" : "&& (h_fit_mass > 80 && h_fit_mass < 150)",
         "doCR" : "&& !(h_fit_mass > 80 && h_fit_mass < 150)",
+        "dataset" : "resolved",
         },
     "gt5bloose_gt3medium_0PFfat"    : {
-        "sel" : "(Nloosebtags > 5 && Nmediumbtags >3 && nprobejets == 0)",
+        "sel" : "(nloosebtags > 5 && nmediumbtags >3 && nprobejets == 0)",
         "label" : "Resolved 4M 2L",
         "doSR" : "&& (h_fit_mass > 80 && h_fit_mass < 150)",
         "doCR" : "&& !(h_fit_mass > 80 && h_fit_mass < 150)",
+        "dataset" : "resolved",
         },
     "gt5bloose_gt4medium_0PFfat"    : {
-        "sel" : "(Nloosebtags > 5 && Nmediumbtags >4 && nprobejets == 0)",
+        "sel" : "(nloosebtags > 5 && nmediumbtags >4 && nprobejets == 0)",
         "label" : "Resolved 5M 1L",
         "doSR" : "&& (h_fit_mass > 80 && h_fit_mass < 150)",
         "doCR" : "&& !(h_fit_mass > 80 && h_fit_mass < 150)",
+        "dataset" : "resolved",
         },
     "gt5bmedium_0PFfat"             : {
-        "sel" : "(Nmediumbtags > 5 && nprobejets == 0)",
+        "sel" : "(nmediumbtags > 5 && nprobejets == 0)",
         "label" : "Resolved 6M",
         "doSR" : "&& (h_fit_mass > 80 && h_fit_mass < 150)",
         "doCR" : "&& !(h_fit_mass > 80 && h_fit_mass < 150)",
+        "dataset" : "resolved",
         },
     "1PFfat"                        : {
         "sel" : "(nprobejets == 1)",
         "label" : "Boosted (1 PN fat jet)",
         "doSR" : "&& (fatJet1Mass > 80 && fatJet1Mass < 150)",
         "doCR" : "&& !(fatJet1Mass > 80 && fatJet1Mass < 150)",
+        "dataset" : "boosted",
         },
     "gt1PFfat"                      : {
         "sel" : "(nprobejets > 1)",
         "label" : "Boosted (> 1 PN fat jet)",
         "doSR" : "&& (fatJet1Mass > 80 && fatJet1Mass < 150)",
         "doCR" : "&& !(fatJet1Mass > 80 && fatJet1Mass < 150)",
+        "dataset" : "boosted",
         },
-    "gt0PFfat"                      : {
-        "sel" : "(nprobejets > 0)",
-        "label" : "Boosted (> 0 PN fat jet)",
-        "doSR" : "&& (fatJet1Mass > 80 && fatJet1Mass < 150)",
-        "doCR" : "&& !(fatJet1Mass > 80 && fatJet1Mass < 150)",
-        },
+    #"gt0PFfat"                      : {
+    #    "sel" : "(nprobejets > 0)",
+    #    "label" : "Boosted (> 0 PN fat jet)",
+    #    "doSR" : "&& (fatJet1Mass > 80 && fatJet1Mass < 150)",
+    #    "doCR" : "&& !(fatJet1Mass > 80 && fatJet1Mass < 150)",
+    #    },
     "1PNfatLoose"                        : {
         "sel" : "(nprobejets == 1 && fatJet1PNetXbb > 0.95)",
         "label" : "Boosted (1 PN fat jet) with PNet Xbb > 0.95",
         "doSR" : "&& (fatJet1Mass > 80 && fatJet1Mass < 150)",
         "doCR" : "&& !(fatJet1Mass > 80 && fatJet1Mass < 150)",
+        "dataset" : "boosted",
         },
     "gt1PNfatLoose"                      : {
         "sel" : "(nprobejets > 1 && fatJet1PNetXbb > 0.95)",
         "label" : "Boosted (> 1 PN fat jet) with PNet Xbb > 0.95",
         "doSR" : "&& (fatJet1Mass > 80 && fatJet1Mass < 150)",
         "doCR" : "&& !(fatJet1Mass > 80 && fatJet1Mass < 150)",
+        "dataset" : "boosted",
         },
     "1PNfatMedium"                        : {
         "sel" : "(nprobejets == 1 && fatJet1PNetXbb > 0.975)",
         "label" : "Boosted (1 PN fat jet) with PNet Xbb > 0.975",
         "doSR" : "&& (fatJet1Mass > 80 && fatJet1Mass < 150)",
         "doCR" : "&& !(fatJet1Mass > 80 && fatJet1Mass < 150)",
+        "dataset" : "boosted",
         },
     "gt1PNfatMedium"                      : {
         "sel" : "(nprobejets > 1 && fatJet1PNetXbb > 0.975)",
         "label" : "Boosted (> 1 PN fat jet) with PNet Xbb > 0.975",
         "doSR" : "&& (fatJet1Mass > 80 && fatJet1Mass < 150)",
         "doCR" : "&& !(fatJet1Mass > 80 && fatJet1Mass < 150)",
+        "dataset" : "boosted",
         },
     "1PNfatTight"                        : {
         "sel" : "(nprobejets == 1 && fatJet1PNetXbb > 0.985)",
         "label" : "Boosted (1 PN fat jet) with PNet Xbb > 0.985",
         "doSR" : "&& (fatJet1Mass > 80 && fatJet1Mass < 150)",
         "doCR" : "&& !(fatJet1Mass > 80 && fatJet1Mass < 150)",
+        "dataset" : "boosted",
         },
     "gt1PNfatTight"                      : {
         "sel" : "(nprobejets > 1 && fatJet1PNetXbb > 0.985)",
         "label" : "Boosted (> 1 PN fat jet) with PNet Xbb > 0.985",
         "doSR" : "&& (fatJet1Mass > 80 && fatJet1Mass < 150)",
         "doCR" : "&& !(fatJet1Mass > 80 && fatJet1Mass < 150)",
+        "dataset" : "boosted",
         },
+    # nprobejets >= 1
     "gt0PFfat_cat1"                      : {
         "sel" : "(nprobejets > 0 && mvaBoosted[0] > 0.4 && fatJet1PNetXbb > 0.985)",
         "label" : "Boosted category 1",
         "doSR" : "&& (fatJet1Mass > 0)",
         "doCR" : "&& !(fatJet1Mass > 80 && fatJet1Mass < 150)",
+        "dataset" : "boosted",
         },
     "gt0PFfat_cat2"                      : {
         "sel" : "(nprobejets > 0 && mvaBoosted[0] > 0.15 && mvaBoosted[0] < 0.4 && fatJet1PNetXbb > 0.985)",
         "label" : "Boosted category 2",
         "doSR" : "&& (fatJet1Mass > 0)",
         "doCR" : "&& !(fatJet1Mass > 80 && fatJet1Mass < 150)",
+        "dataset" : "boosted",
         },
     "gt0PFfat_cat3"                      : {
-        "sel" : "(nprobejets > 0 && mvaBoosted[0] > -0.04 && mvaBoosted < 0.4 && && fatJet1PNetXbb > 0.95)",
+        "sel" : "(nprobejets > 0 && mvaBoosted[0] > -0.04 && mvaBoosted[0] < 0.4 && fatJet1PNetXbb > 0.95)",
         "label" : "Boosted category 3",
         "doSR" : "&& (fatJet1Mass > 0)",
         "doCR" : "&& !(fatJet1Mass > 80 && fatJet1Mass < 150)",
+        "dataset" : "boosted",
         },
-    "gt0PFfat_cat4"                      : {
-        "sel" : "(nprobejets > 0 && mvaBoosted[0] > -0.04 && && fatJet1PNetXbb < 0.95)",
-        "label" : "Boosted category 4",
+    # nprobejets >= 2
+    "gt1PFfat_cat1"                      : {
+        "sel" : "(nprobejets > 1 && mvaBoosted[0] > 0.15 && fatJet1PNetXbb > 0.985)",
+        "label" : "Boosted category 1",
         "doSR" : "&& (fatJet1Mass > 0)",
         "doCR" : "&& !(fatJet1Mass > 80 && fatJet1Mass < 150)",
+        "dataset" : "boosted",
+        },
+    "gt1PFfat_cat2"                      : {
+        "sel" : "(nprobejets > 1 && mvaBoosted[0] > 0.0 && mvaBoosted[0] < 0.15 && fatJet1PNetXbb > 0.985)",
+        "label" : "Boosted category 2",
+        "doSR" : "&& (fatJet1Mass > 0)",
+        "doCR" : "&& !(fatJet1Mass > 80 && fatJet1Mass < 150)",
+        "dataset" : "boosted",
+        },
+    "gt1PFfat_cat3"                      : {
+        "sel" : "(nprobejets > 1 && mvaBoosted[0] > 0.0 && mvaBoosted[0] < 0.15 && fatJet1PNetXbb > 0.95)",
+        "label" : "Boosted category 3",
+        "doSR" : "&& (fatJet1Mass > 0)",
+        "doCR" : "&& !(fatJet1Mass > 80 && fatJet1Mass < 150)",
+        "dataset" : "boosted",
+        },
+    # nprobejets == 1
+    "1PFfat_cat1"                      : {
+        "sel" : "(nprobejets == 1 && mvaBoosted[0] > 0.15 && fatJet1PNetXbb > 0.985)",
+        "label" : "Boosted category 1",
+        "doSR" : "&& (fatJet1Mass > 0)",
+        "doCR" : "&& !(fatJet1Mass > 80 && fatJet1Mass < 150)",
+        "dataset" : "boosted",
+        },
+    "1PFfat_cat2"                      : {
+        "sel" : "(nprobejets == 1 && mvaBoosted[0] > 0.0 && mvaBoosted[0] < 0.15 && fatJet1PNetXbb > 0.985)",
+        "label" : "Boosted category 2",
+        "doSR" : "&& (fatJet1Mass > 0)",
+        "doCR" : "&& !(fatJet1Mass > 80 && fatJet1Mass < 150)",
+        "dataset" : "boosted",
+        },
+    "1PFfat_cat3"                      : {
+        "sel" : "(nprobejets == 1 && mvaBoosted[0] > 0.0 && mvaBoosted[0] < 0.15 && fatJet1PNetXbb > 0.95)",
+        "label" : "Boosted category 3",
+        "doSR" : "&& (fatJet1Mass > 0)",
+        "doCR" : "&& !(fatJet1Mass > 80 && fatJet1Mass < 150)",
+        "dataset" : "boosted",
+        },
+
+    # inclusive boosted category
+    "gt0PFfat"                      : {
+        "sel" : "(nprobejets > 0 && mvaBoosted[0] > 0.0 && fatJet1PNetXbb > 0.95)",
+        "label" : "Boosted category 3",
+        "doSR" : "&& (fatJet1Mass > 0)",
+        "doCR" : "&& !(fatJet1Mass > 80 && fatJet1Mass < 150)",
+        "dataset" : "boosted",
+        },
+    "gt0PFfat_PNetTight"                      : {
+        "sel" : "(nprobejets > 0 && mvaBoosted[0] > 0.0 && fatJet1PNetXbb > 0.985)",
+        "label" : "Boosted category 3",
+        "doSR" : "&& (fatJet1Mass > 0)",
+        "doCR" : "&& !(fatJet1Mass > 80 && fatJet1Mass < 150)",
+        "dataset" : "boosted",
         },
     ## you can add here categories with PN score
 }
@@ -192,12 +268,9 @@ if do_CR :
     #additional_selection = " && !(h_fit_mass > 80 && h_fit_mass < 150)"
     additional_label     = "CR"
 
-# define function to run on mHHH
-init_mhhh()
-
 inputTree = 'Events'
 
-procstodo = ["ZZZ", "WZZ", "WWZ", "WWW", "ZZTo4Q", "WWTo4Q", "ZJetsToQQ", "WJetsToQQ", "TT", "QCD", "QCD6B", "data_obs" , "GluGluToHHHTo6B_SM"]
+procstodo = ["ZZZ", "WZZ", "WWZ", "WWW", "ZZTo4Q", "WWTo4Q", "ZJetsToQQ", "WJetsToQQ", "TTToHadronic","TTo2L2Nu","TTToSemiLeptonic", "QCD", "data_obs" , "GluGluToHHHTo6B_SM"]
 if not process_to_compute == 'none' :
     procstodo     = [process_to_compute]
     skip_do_plots = True
@@ -209,6 +282,19 @@ for era in [2018] :
 wp_loose = wps_years['loose'][year]
 wp_medium = wps_years['medium'][year]
 wp_tight = wps_years['tight'][year]
+
+# define function to run on mHHH
+init_mhhh()
+ROOT.gInterpreter.Declare(triggersCorrections[year][0])
+
+# define b-tagging
+if '2016APV' in year:
+    btag_init('2016preVFP')
+elif '2016' in year:
+    btag_init('2016postVFP')
+else:
+    btag_init(year)
+
 
 csv_saved = False
 for selection in selections.keys() :
@@ -233,6 +319,8 @@ for selection in selections.keys() :
       print("made directory %s" % output_folder)
 
   if not skip_do_trees :
+
+   firstProc = True
    for proctodo in procstodo :
 
     ## do that in a utils function
@@ -245,8 +333,10 @@ for selection in selections.keys() :
 
     outtree = "{}/{}_{}/{}.root".format(input_tree,selection,additional_label,proctodo)
 
-    list_proc=glob.glob("{}/inclusive/{}.root".format(input_tree,datahist))
+    dataset = selections[selection]["dataset"] # inclusive_resolved or inclusive_boosted
+    list_proc=glob.glob("{}/inclusive_{}/{}.root".format(input_tree,dataset,datahist))
     print("Will create %s" % outtree)
+
 
     for proc in list_proc :
         #if not csv_saved :
@@ -260,30 +350,25 @@ for selection in selections.keys() :
 
         chunk_df = ROOT.RDataFrame(inputTree, proc)
 
-        # add mHHH variable
-        #chunk_df = addMHHH(chunk_df)
+        # initialise df - so we don't need make_selection_rdataframes.py anymore
+
+        chunk_df = initialise_df(chunk_df,year,proc)
+        
+        if firstProc:
+            #init_bdt(chunk_df,year)
+            init_bdt(chunk_df,year)
+            init_bdt_boosted(chunk_df,year)
+            firstProc = False
 
         entries_no_filter = int(chunk_df.Count().GetValue())
 
-        print("Redefine btag counting ")
-        count_loose=[]
-        count_medium=[]
-        count_tight=[]
-        for jet in range(1,11) :
-             count_loose.append('int(jet%sDeepFlavB > %f)'%(jet,wp_loose))
-             count_medium.append('int(jet%sDeepFlavB > %f)'%(jet,wp_medium))
-             count_tight.append('int(jet%sDeepFlavB > %f)'%(jet,wp_tight))
-
-        nloose = '+'.join(count_loose)
-        nmedium = '+'.join(count_medium)
-        ntight = '+'.join(count_tight)
-
-        chunk_df = chunk_df.Define('Nloosebtags',nloose)
-        chunk_df = chunk_df.Define('Nmediumbtags',nmedium)
-        chunk_df = chunk_df.Define('Ntightbtags',ntight)
+        # Add mva and mvaBoosted variables (needs to happen before cutting on variables mva and mvaBoosted)
+        chunk_df = add_bdt(chunk_df,year)
+        chunk_df = add_bdt_boosted(chunk_df,year)
 
         chunk_df = chunk_df.Filter(final_selection)
         entries = int(chunk_df.Count().GetValue())
+
 
         #print("cut made, tree size: ", int(tree.GetEntries()), int(tree_cut.GetEntries()))
         print("cut made, tree size: ", entries_no_filter, entries)
@@ -291,7 +376,9 @@ for selection in selections.keys() :
         variables = list(chunk_df.GetColumnNames())
 
         print("Cleaning variables", len(variables))
-        variables = clean_variables(variables)
+        #variables = clean_variables(variables)
+        variables = save_variables
+
         ## if to do limit the cleaning will be different
         print("Cleaned variables", len(variables))
         print(variables)

@@ -122,17 +122,17 @@ histograms_dict = {
         'fatJet2PNetQCD'  : { "nbins" : 20 , "xmin" : 0 , "xmax" : 1, "label" : 'PNet QCD(fatJet2)'},
         'fatJet3PNetQCD'  : { "nbins" : 20 , "xmin" : 0 , "xmax" : 1, "label" : 'PNet QCD(fatJet3)'},
 
-        'HHH_mass'   : { "nbins" : 80 , "xmin" : 0 , "xmax" : 1600, "label" : 'm(HHH) (GeV)'},
-        'HHH_pt'     : { "nbins" : 80 , "xmin" : 0 , "xmax" : 800, "label" : 'p_{T}(HHH) (GeV)'},
-        'HHH_eta'    : { "nbins" : 15 , "xmin" : 0 , "xmax" : 2.5, "label" : '#eta(HHH) (GeV)'},
+        #'HHH_mass'   : { "nbins" : 80 , "xmin" : 0 , "xmax" : 1600, "label" : 'm(HHH) (GeV)'},
+        #'HHH_pt'     : { "nbins" : 80 , "xmin" : 0 , "xmax" : 800, "label" : 'p_{T}(HHH) (GeV)'},
+        #'HHH_eta'    : { "nbins" : 15 , "xmin" : 0 , "xmax" : 2.5, "label" : '#eta(HHH) (GeV)'},
 
         #'nfatjets'    : { "nbins" : 5 , "xmin" : 0 , "xmax" : 5, "label" : 'N fat-jets'},
         'nprobejets'  : { "nbins" : 5 , "xmin" : 0 , "xmax" : 5, "label" : 'N fat-jets'},
         'nbtags'      : { "nbins" : 10 , "xmin" : 0 , "xmax" : 10, "label" : 'N b-tags'},
 
-        'Nloosebtags'   : { "nbins" : 5 , "xmin" : 5 , "xmax" : 10, "label" : 'N loose b-tags'},
-        'Nmediumbtags'  : { "nbins" : 10 , "xmin" : 0 , "xmax" : 10, "label" : 'N meidum b-tags'},
-        'Ntightbtags'   : { "nbins" : 10 , "xmin" : 0 , "xmax" : 10, "label" : 'N tight b-tags'},
+        'nloosebtags'   : { "nbins" : 5 , "xmin" : 5 , "xmax" : 10, "label" : 'N loose b-tags'},
+        'nmediumbtags'  : { "nbins" : 10 , "xmin" : 0 , "xmax" : 10, "label" : 'N meidum b-tags'},
+        'ntightbtags'   : { "nbins" : 10 , "xmin" : 0 , "xmax" : 10, "label" : 'N tight b-tags'},
 
         'ht'   : { "nbins" : 90 , "xmin" : 0 , "xmax" : 1800, "label" : 'Event HT [GeV]'},
         'met'  : { "nbins" : 25 , "xmin" : 0 , "xmax" : 500, "label" : 'E_{T}^{miss} [GeV]'},
@@ -189,6 +189,8 @@ hist_properties = {'JetHT' : [ROOT.kBlack, 0.8, 0, 'Data', True] ,
                    'WZZ' : [ROOT.kGreen, 0, 0, 'VVV', False],
                    'WWZ' : [ROOT.kGreen, 0, 0, 'VVV', False],
                    'TT' : [ROOT.kBlue, 0,0, 't#bar{t}', True],
+                   'TTToHadronic' : [ROOT.kBlue, 0,0, 't#bar{t}', True],
+                   'TTToSemiLeptonic' : [ROOT.kBlue, 0,0, 't#bar{t}', False],
                    'ZZTo4Q' : [ROOT.kGray, 0, 0, 'VV', True],
                    'WWTo4Q' : [ROOT.kGray, 0, 0, 'VV', False],
                    'ZJetsToQQ'   : [ROOT.kCyan, 0, 0, 'V+jets', True],
@@ -237,7 +239,7 @@ def clean_variables(variables) :
     #    for var in variables :
     #        if str(var).find(testing) != -1:
     #            variables.remove(var)
-    ls_to_remove = ["HLT", "LHE", "v_", "L1_", "l1PreFiringWeight", "trigger", "vbf", "lep",  "pu", "_Up", "_Down", 'passmetfilters', 'PSWeight', "boostedTau", "boostedTau_"]
+    ls_to_remove = ["HLT", "LHE", "v_", "L1_", "l1PreFiringWeight", "trigger", "vbf", "lep",  "pu", "_Up", "_Down", 'passmetfilters', 'PSWeight', "boostedTau", "boostedTau_",'L1_']
     variables = [el for el in variables if not any(ext in el for ext in ls_to_remove)]
 
     # remove variables based on 6 first btags to not confuse
@@ -252,7 +254,10 @@ def clean_variables(variables) :
 
     for hhhvar in ['hhh_resolved_mass', 'hhh_resolved_pt', 'hhh_t3_pt', 'hhh_mass', 'hhh_pt', "hh_eta", "hh_mass", "hh_phi", "hh_pt", "hhh_eta", "hhh_phi",] :
         #print("removed %s" % hhhvar)
-        variables.remove(hhhvar)
+        try:
+            variables.remove(hhhvar)
+        except:
+            continue
 
     # those above are not what we think they are
     for hhhvar in [ 'eta_MassRegressed', 'phi_MassRegressed', 'mass_MassRegressed'] :
@@ -468,73 +473,6 @@ triggersCorrections = {
                        '2018' : [hlt_sf_2018,hlt_method_2018],
         }
 
-
-path_bdt_xml = '/isilon/data/users/mstamenk/hhh-6b-producer/CMSSW_12_5_2/src/data/bdt/'
-bdts_xml = {
-            '2016APV' : [path_bdt_xml+'TMVAClassification_2016APV_v24_regular.xml',path_bdt_xml+'TMVAClassification_2016APV_v24_inverted.xml'],
-            '2016' : [path_bdt_xml+'TMVAClassification_2016_v24_regular.xml',path_bdt_xml+'TMVAClassification_2016_v24_inverted.xml'],
-            '2017' : [path_bdt_xml+'TMVAClassification_2017_v24_regular.xml',path_bdt_xml+'TMVAClassification_2017_v24_inverted.xml'],
-            '2018' : [path_bdt_xml+'TMVAClassification_2018_v24_regular.xml',path_bdt_xml+'TMVAClassification_2018_v24_inverted.xml'],
-            #'2017' : ['/isilon/data/users/mstamenk/hhh-6b-producer/CMSSW_12_5_2/src/data/bdt/TMVAClassification_2017_BDT.weights.xml'],
-            #'2018' : '/isilon/data/users/mstamenk/hhh-6b-producer/CMSSW_12_5_2/src/data/bdt/TMVAClassification_2018_optimal_BDT.weights.xml'
-            }
-
-# Keep old function
-#def add_bdt(df, xmlpath):
-#    ROOT.gInterpreter.ProcessLine('''TMVA::Experimental::RReader model("{}");'''.format(xmlpath))
-#    nvars = ROOT.model.GetVariableNames().size()
-#    ROOT.gInterpreter.ProcessLine('''auto computeModel = TMVA::Experimental::Compute<{}, float>(model);'''.format(nvars))
-#
-#    l_expr = ROOT.model.GetVariableNames()
-#    l_varn = ROOT.std.vector['std::string']()
-#    for i_expr, expr in enumerate(l_expr):
-#        varname = 'v_{}'.format(i_expr)
-#        l_varn.push_back(varname)
-#
-#        df=df.Define(varname, '(float)({})'.format(expr) )
-#
-#    df = df.Define('mva', ROOT.computeModel, l_varn)
-#
-#    return df
-
-def add_bdt(df, year):
-    xmlpath_odd, xmlpath_even = bdts_xml[year]
-
-
-    ROOT.gInterpreter.ProcessLine('''TMVA::Experimental::RReader model_even("{}");'''.format(xmlpath_even))
-    nvars = ROOT.model_even.GetVariableNames().size()
-    #ROOT.gInterpreter.Declare('''auto computeModel_even = TMVA::Experimental::Compute<{}, float>(model_even);'''.format(nvars))
-
-    ROOT.gInterpreter.ProcessLine('''TMVA::Experimental::RReader model_odd("{}");'''.format(xmlpath_odd))
-    nvars = ROOT.model_odd.GetVariableNames().size()
-    #ROOT.gInterpreter.Declare('''auto computeModel_odd = TMVA::Experimental::Compute<{}, float>(model_odd);'''.format(nvars))
-
-    l_expr = ROOT.model_even.GetVariableNames()
-    l_varn = ROOT.std.vector['std::string']()
-    l_varn.push_back('event')
-
-    ls_var = ['int event']
-    ls_call = ['event']
-    ls_bdt = []
-
-    for i_expr, expr in enumerate(l_expr):
-        varname = 'v_{}'.format(i_expr)
-        l_varn.push_back(varname)
-        df=df.Define(varname, '(float)({})'.format(expr) )
-        ls_var.append('float ' + varname)
-        ls_call.append(varname)
-        ls_bdt.append(varname)
-
-    method_all = ','.join(ls_var)
-    method_bdt = ','.join(ls_bdt)
-    method_call = ','.join(ls_call)
-
-    # Split even and odd numbers and apply it different mva training
-    ROOT.gInterpreter.Declare(" auto computeModel(%s){ auto prediction = model_odd.Compute({%s}); if (event"%(method_all,method_bdt) + "%"+ " 2 == 0) { prediction =  model_even.Compute({%s});} return prediction;}"%(method_bdt))
-    df = df.Define('mva', 'computeModel(%s)'%method_call)
-
-    return df
-
 computeMHHH = '''
     float computeMHHH(float h1_t3_mass, float h1_t3_pt, float h1_t3_eta, float h1_t3_phi,float h2_t3_mass, float h2_t3_pt, float h2_t3_eta, float h2_t3_phi, float h3_t3_mass, float h3_t3_pt, float h3_t3_eta, float h3_t3_phi) {
         TLorentzVector h1;
@@ -567,3 +505,52 @@ def drawText(x, y, text, color = ROOT.kBlack, fontsize = 0.05, font = 42, doNDC 
     tex.SetTextFont(font)
     tex.SetTextColor(color)
     tex.DrawLatex(x, y, text)
+
+mva_variables = ['h2_t3_mass','h3_t3_mass','h2_t3_dRjets','h3_t3_dRjets','jet1Pt','jet2Pt','jet3Pt','jet4Pt','jet5Pt','jet6Pt','jet1Eta','jet2Eta','jet3Eta','jet4Eta','jet5Eta','jet6Eta','jet1Phi','jet2Phi','jet3Phi','jet4Phi','jet5Phi','jet6Phi','jet1DeepFlavB','jet2DeepFlavB','jet3DeepFlavB','jet4DeepFlavB','jet5DeepFlavB','jet6DeepFlavB','fatJet1Pt','fatJet1Eta','fatJet2Mass','fatJet2Pt','fatJet2Eta','fatJet2PNetXbb','fatJet3Mass','fatJet3Pt','fatJet3Eta','fatJet3PNetXbb','fatJet2PNetQCD','fatJet3PNetQCD','jet7Pt','jet7Eta','jet7Phi','jet7DeepFlavB','jet8Pt','jet8Eta','jet8Phi','jet8DeepFlavB','jet9Pt','jet9Eta','jet9Phi','jet9DeepFlavB','jet10Pt','jet10Eta','jet10Phi','jet10DeepFlavB','mHHH','nloosebtags','nmediumbtags','ntightbtags','ht','met','lep1Pt','lep1Eta','lep1Phi','lep2Pt','lep2Eta','lep2Phi','nsmalljets','nfatjets']
+
+#save_variables = ['h_fit_mass','h1_t3_mass','h2_t3_mass','h3_t3_mass','h2_t3_dRjets','h3_t3_dRjets','jet1Pt','jet2Pt','jet3Pt','jet4Pt','jet5Pt','jet6Pt','jet1Eta','jet2Eta','jet3Eta','jet4Eta','jet5Eta','jet6Eta','jet1Phi','jet2Phi','jet3Phi','jet4Phi','jet5Phi','jet6Phi','jet1DeepFlavB','jet2DeepFlavB','jet3DeepFlavB','jet4DeepFlavB','jet5DeepFlavB','jet6DeepFlavB','fatJet1Mass','fatJet1Pt','fatJet1Eta','fatJet2Mass','fatJet1PNetXbb','fatJet2Pt','fatJet2Eta','fatJet2PNetXbb','fatJet3Mass','fatJet3Pt','fatJet3Eta','fatJet3PNetXbb','fatJet2PNetQCD','fatJet3PNetQCD','jet7Pt','jet7Eta','jet7Phi','jet7DeepFlavB','jet8Pt','jet8Eta','jet8Phi','jet8DeepFlavB','jet9Pt','jet9Eta','jet9Phi','jet9DeepFlavB','jet10Pt','jet10Eta','jet10Phi','jet10DeepFlavB','mHHH','nloosebtags','nmediumbtags','ntightbtags','ht','met','lep1Pt','lep1Eta','lep1Phi','lep2Pt','lep2Eta','lep2Phi','nsmalljets','nfatjets','event']
+
+save_variables = list(histograms_dict.keys()) + ['event','nsmalljets','nfatjets','mHHH','mva','mvaBoosted']
+
+from calibrations import btag_init, addBTagSF, addBTagEffSF
+
+def initialise_df(df,year,proc):
+
+    lumi = luminosities[year]
+    df = df.Define('triggerSF', triggersCorrections[year][1] )
+    cutWeight = '(%f * weight * xsecWeight * l1PreFiringWeight * puWeight * genWeight * triggerSF)'%(lumi)
+    if 'JetHT' in proc or 'BTagCSV' in proc:
+        df = df.Define('eventWeight','1')
+    else:
+        df = df.Define('eventWeight',cutWeight)
+    df = addMHHH(df)
+
+    wp_loose = wps_years['loose'][year]
+    wp_medium = wps_years['medium'][year]
+    wp_tight = wps_years['tight'][year]
+
+    count_loose = []
+    count_medium = []
+    count_tight = []
+
+    for jet in ['jet1','jet2','jet3','jet4','jet5','jet6','jet7','jet8','jet9','jet10']:
+        count_loose.append('int(%sDeepFlavB > %f)'%(jet,wp_loose))
+        count_medium.append('int(%sDeepFlavB > %f)'%(jet,wp_medium))
+        count_tight.append('int(%sDeepFlavB > %f)'%(jet,wp_tight))
+
+    nloose = '+'.join(count_loose)
+    nmedium = '+'.join(count_medium)
+    ntight = '+'.join(count_tight)
+
+
+    df = df.Define('nloosebtags',nloose)
+    df = df.Define('nmediumbtags',nmedium)
+    df = df.Define('ntightbtags',ntight)
+
+    df = addBTagEffSF(df,proc,'loose')
+    df = addBTagEffSF(df,proc,'medium')
+    df = addBTagEffSF(df,proc,'tight')
+
+    return df
+
+

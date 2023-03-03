@@ -74,26 +74,26 @@ def addBTagEffSF(df,f_in,wp):
 
     if 'JetHT' in f_in or 'BTagCSV' in f_in:
         if wp == 'loose':
-            df = df.Define('bcand1LooseBTagEffSF', '1')
-            df = df.Define('bcand2LooseBTagEffSF', '1')
-            df = df.Define('bcand3LooseBTagEffSF', '1')
-            df = df.Define('bcand4LooseBTagEffSF', '1')
-            df = df.Define('bcand5LooseBTagEffSF', '1')
-            df = df.Define('bcand6LooseBTagEffSF', '1')
+            df = df.Define('jet1LooseBTagEffSF', '1')
+            df = df.Define('jet2LooseBTagEffSF', '1')
+            df = df.Define('jet3LooseBTagEffSF', '1')
+            df = df.Define('jet4LooseBTagEffSF', '1')
+            df = df.Define('jet5LooseBTagEffSF', '1')
+            df = df.Define('jet6LooseBTagEffSF', '1')
         elif wp == 'medium':
-            df = df.Define('bcand1MediumBTagEffSF', '1')
-            df = df.Define('bcand2MediumBTagEffSF', '1')
-            df = df.Define('bcand3MediumBTagEffSF', '1')
-            df = df.Define('bcand4MediumBTagEffSF', '1')
-            df = df.Define('bcand5MediumBTagEffSF', '1')
-            df = df.Define('bcand6MediumBTagEffSF', '1')
+            df = df.Define('jet1MediumBTagEffSF', '1')
+            df = df.Define('jet2MediumBTagEffSF', '1')
+            df = df.Define('jet3MediumBTagEffSF', '1')
+            df = df.Define('jet4MediumBTagEffSF', '1')
+            df = df.Define('jet5MediumBTagEffSF', '1')
+            df = df.Define('jet6MediumBTagEffSF', '1')
         elif wp == 'tight':
-            df = df.Define('bcand1TightBTagEffSF', '1')
-            df = df.Define('bcand2TightBTagEffSF', '1')
-            df = df.Define('bcand3TightBTagEffSF', '1')
-            df = df.Define('bcand4TightBTagEffSF', '1')
-            df = df.Define('bcand5TightBTagEffSF', '1')
-            df = df.Define('bcand6TightBTagEffSF', '1')
+            df = df.Define('jet1TightBTagEffSF', '1')
+            df = df.Define('jet2TightBTagEffSF', '1')
+            df = df.Define('jet3TightBTagEffSF', '1')
+            df = df.Define('jet4TightBTagEffSF', '1')
+            df = df.Define('jet5TightBTagEffSF', '1')
+            df = df.Define('jet6TightBTagEffSF', '1')
     else: 
         if wp == 'loose':
             ROOT.gInterpreter.Declare(computeLooseBTAGSF)
@@ -107,12 +107,12 @@ def addBTagEffSF(df,f_in,wp):
             ROOT.gInterpreter.Declare(computeTightBTAGSF)
             name = 'TightBTagEffSF'
             script = 'computeTightBTagsEffSFPerFlavour'
-        df = df.Define('bcand1%s'%name, "%s(int(round(bcand1HadronFlavour)),std::abs(bcand1Eta),bcand1Pt)"%script)
-        df = df.Define('bcand2%s'%name, "%s(int(round(bcand2HadronFlavour)),std::abs(bcand2Eta),bcand2Pt)"%script)
-        df = df.Define('bcand3%s'%name, "%s(int(round(bcand3HadronFlavour)),std::abs(bcand3Eta),bcand3Pt)"%script)
-        df = df.Define('bcand4%s'%name, "%s(int(round(bcand4HadronFlavour)),std::abs(bcand4Eta),bcand4Pt)"%script)
-        df = df.Define('bcand5%s'%name, "%s(int(round(bcand5HadronFlavour)),std::abs(bcand5Eta),bcand5Pt)"%script)
-        df = df.Define('bcand6%s'%name, "%s(int(round(bcand6HadronFlavour)),std::abs(bcand6Eta),bcand6Pt)"%script)
+        df = df.Define('jet1%s'%name, "%s(int(round(jet1HadronFlavour)),std::abs(jet1Eta),jet1Pt)"%script)
+        df = df.Define('jet2%s'%name, "%s(int(round(jet2HadronFlavour)),std::abs(jet2Eta),jet2Pt)"%script)
+        df = df.Define('jet3%s'%name, "%s(int(round(jet3HadronFlavour)),std::abs(jet3Eta),jet3Pt)"%script)
+        df = df.Define('jet4%s'%name, "%s(int(round(jet4HadronFlavour)),std::abs(jet4Eta),jet4Pt)"%script)
+        df = df.Define('jet5%s'%name, "%s(int(round(jet5HadronFlavour)),std::abs(jet5Eta),jet5Pt)"%script)
+        df = df.Define('jet6%s'%name, "%s(int(round(jet6HadronFlavour)),std::abs(jet6Eta),jet6Pt)"%script)
     return df
 
 
