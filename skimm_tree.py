@@ -352,14 +352,13 @@ for selection in selections.keys() :
 
         # initialise df - so we don't need make_selection_rdataframes.py anymore
 
-        chunk_df = initialise_df(chunk_df,year,proc)
+        chunk_df = initialise_df(chunk_df,year,proc) # mHHH done inside now
         
         if firstProc:
             #init_bdt(chunk_df,year)
             init_bdt(chunk_df,year)
             init_bdt_boosted(chunk_df,year)
             firstProc = False
-
         entries_no_filter = int(chunk_df.Count().GetValue())
 
         # Add mva and mvaBoosted variables (needs to happen before cutting on variables mva and mvaBoosted)
@@ -381,7 +380,7 @@ for selection in selections.keys() :
 
         ## if to do limit the cleaning will be different
         print("Cleaned variables", len(variables))
-        print(variables)
+        #print(variables)
         ## cleaning is not working for all variables, even if explicitelly asking to remove all that name, and for some not cleaned variables will given
         ## Error in <TBranch::TBranch>: Illegal leaf: LHEReweightingWeight/LHEReweightingWeight[nLHEReweightingWeight]/F. If this is a variable size C array it's possible that the branch holding the size is not available
         ## Maybe because I do not source CMSSW
@@ -433,6 +432,8 @@ for selection in selections.keys() :
 
         proc_yield = chunk_df.Sum('totalWeight')
         print("Yield:", proc_yield.GetValue())
+
+        print(variables)
 
         chunk_df.Snapshot(inputTree, outtree, variables + ['totalWeight'])
 
