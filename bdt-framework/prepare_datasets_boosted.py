@@ -2,6 +2,7 @@
 import os, ROOT
 
 from utils import get_scans, mva_variables, luminosities, triggersCorrections,init_mhhh, addMHHH, wps_years
+from hhh_variables import add_hhh_variables
 
 ROOT.gROOT.SetBatch(ROOT.kTRUE)
 ROOT.ROOT.EnableImplicitMT()
@@ -10,7 +11,10 @@ ROOT.ROOT.EnableImplicitMT()
 init_mhhh()
 
 def initialise_df(df,year):
-    df = df.Define('triggerSF', triggersCorrections[year][1] )
+    if '2016' in year:
+        df = df.Define('triggerSF', triggersCorrections['2016'][1] )
+    else:
+        df = df.Define('triggerSF', triggersCorrections[year][1] )
     cutWeight = '(%f * weight * xsecWeight * l1PreFiringWeight * puWeight * genWeight * triggerSF)'%(lumi)
     df = df.Define('eventWeight',cutWeight)
     df = addMHHH(df)
@@ -39,14 +43,17 @@ def initialise_df(df,year):
 
     return df
 
-categories = {'nAK8_1' : 'nprobejets == 1',
+categories = {
+              'nAK8_0_failLoose' : 'nprobejets == 1 && nloosebtags < 6',  
+              'nAK8_0_passLoose' : 'nprobejets == 1 && nloosebtags >= 6',  
+              'nAK8_1' : 'nprobejets == 1',
               'nAK8_1p' : 'nprobejets >= 1',
               'nAK8_2p' : 'nprobejets >= 2',
         }
 
 regions = {'SR' : 'fatJet1Mass > 80 && fatJet1Mass < 150',
            'CR' : 'fatJet1Mass < 80 || fatJet1Mass > 150',
-           'inclusive' : 'fatJet1Mass > 0',
+           'inclusive' : 'fatJet1Mass > 70 && fatJet1Mass < 200',
         }
 
 pnets = {'loose' : 'fatJet1PNetXbb > 0.95', 
@@ -57,15 +64,21 @@ pnets = {'loose' : 'fatJet1PNetXbb > 0.95',
 variables = mva_variables + ['eventWeight']
 
 if __name__ == '__main__':
+    #year = '2016APV'
+    #year = '2016'
+    #year = '2017'
     year = '2018'
-
-    ROOT.gInterpreter.Declare(triggersCorrections[year][0])
+    if '2016APV' in year:
+        ROOT.gInterpreter.Declare(triggersCorrections[year.replace('APV','')][0])
+    else:
+        ROOT.gInterpreter.Declare(triggersCorrections[year][0])
+    
     lumi = luminosities[year]
 
 
     version = 'v26'
     #path = '/isilon/data/users/mstamenk/eos-triple-h/v25/mva-inputs-HLT-fit-inputs-all-fixes-v25-inclusive-loose-wp-0ptag-%s'%year
-    path = '/isilon/data/users/mstamenk/eos-triple-h/v26/mva-inputs-2018/inclusive/'
+    path = '/isilon/data/users/mstamenk/eos-triple-h/v26/mva-inputs-%s/inclusive_boosted/'%year
     signal_vector = ROOT.std.vector('string')()
     background_vector = ROOT.std.vector('string')()
 
@@ -75,12 +88,12 @@ if __name__ == '__main__':
 
     signal_samples = [signal_vector, 'signal']
 
-    for f in ['QCD.root','QCD_bEnriched.root','TT.root','WJetsToQQ.root','WWTo4Q.root','WWW.root','WWZ.root','WZZ.root','ZJetsToQQ.root','ZZTo4Q.root','ZZZ.root']:
+    for f in ['QCD.root','QCD_bEnriched.root','TTToHadronic.root','TTToSemiLeptonic.root','WJetsToQQ.root','WWTo4Q.root','WWW.root','WWZ.root','WZZ.root','ZJetsToQQ.root','ZZTo4Q.root','ZZZ.root']:
     #for f in ['QCD.root','TT.root','WJetsToQQ.root','WWTo4Q.root','WWW.root','WZZ.root','ZJetsToQQ.root','ZZTo4Q.root','ZZZ.root']:
         background_vector.push_back(path + '/' + f)
     background_samples = [background_vector, 'background']
 
-    category = 'nAK8_2p'
+    category = 'nAK8_1p'
     region = 'inclusive'
     pnet = 'loose'
 
@@ -105,10 +118,17 @@ if __name__ == '__main__':
         #  add variables for df
         df = initialise_df(df,year)
 
+        df,masses,pts,etas,phis = add_hhh_variables(df)
+        print(masses,pts,etas,phis)
+
 
         report = df.Report()
+        report.Print()
 
-        columns = ROOT.std.vector["string"](variables)
+        save_variables = variables + masses + pts + etas + phis
+
+        columns = ROOT.std.vector["string"](save_variables)
+        #columns = ROOT.std.vector["string"](variables)
 
         df.Filter("event % 2 == 0", "Select even events for training").Snapshot('Events', output + '/' + 'train_%s.root'%label,columns)
         df.Filter("event % 2 == 1", "Select even events for testing").Snapshot('Events', output + '/' + 'test_%s.root'%label,columns)
