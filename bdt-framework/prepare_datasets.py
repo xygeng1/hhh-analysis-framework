@@ -1,60 +1,139 @@
 # Script to prepare data set for MVA training
 import os, ROOT
 
-from utils import get_scans
+from utils import get_scans, mva_variables, luminosities, triggersCorrections,init_mhhh, addMHHH, wps_years
+from hhh_variables import add_hhh_variables
 
 ROOT.gROOT.SetBatch(ROOT.kTRUE)
 ROOT.ROOT.EnableImplicitMT()
 
-variables = ['h_fit_mass','h1_t3_mass','h2_t3_mass','h3_t3_mass','h1_t3_dRjets','h2_t3_dRjets','h3_t3_dRjets','bcand1Pt','bcand2Pt','bcand3Pt','bcand4Pt','bcand5Pt','bcand6Pt','bcand1Eta','bcand2Eta','bcand3Eta','bcand4Eta','bcand5Eta','bcand6Eta','bcand1Phi','bcand2Phi','bcand3Phi','bcand4Phi','bcand5Phi','bcand6Phi','bcand1DeepFlavB','bcand2DeepFlavB','bcand3DeepFlavB','bcand4DeepFlavB','bcand5DeepFlavB','bcand6DeepFlavB','fatJet1Mass','fatJet1Pt','fatJet1Eta','fatJet1PNetXbb','fatJet2Mass','fatJet2Pt','fatJet2Eta','fatJet2PNetXbb','fatJet3Mass','fatJet3Pt','fatJet3Eta','fatJet3PNetXbb','fatJet1PNetQCD','fatJet2PNetQCD','fatJet3PNetQCD','jet7Pt','jet7Eta','jet7Phi','jet7DeepFlavB','jet8Pt','jet8Eta','jet8Phi','jet8DeepFlavB','jet9Pt','jet9Eta','jet9Phi','jet9DeepFlavB','jet10Pt','jet10Eta','jet10Phi','jet10DeepFlavB','eventWeightBTagCorrected','eventWeight', 'bcand1BTagSF','bcand2BTagSF','bcand3BTagSF','bcand4BTagSF','bcand5BTagSF','bcand6BTagSF','jet7BTagSF','jet8BTagSF','jet9BTagSF','jet10BTagSF', 'ttWeight','dtWeight']
+
+init_mhhh()
+
+def initialise_df(df,year):
+    if '2016' in year:
+        df = df.Define('triggerSF', triggersCorrections['2016'][1] )
+    else:
+        df = df.Define('triggerSF', triggersCorrections[year][1] )
+    cutWeight = '(%f * weight * xsecWeight * l1PreFiringWeight * puWeight * genWeight * triggerSF)'%(lumi)
+    df = df.Define('eventWeight',cutWeight)
+    df = addMHHH(df)
+
+    wp_loose = wps_years['loose'][year]
+    wp_medium = wps_years['medium'][year]
+    wp_tight = wps_years['tight'][year]
+
+    count_loose = []
+    count_medium = []
+    count_tight = []
+
+    for jet in ['jet1','jet2','jet3','jet4','jet5','jet6','jet7','jet8','jet9','jet10']:
+        count_loose.append('int(%sDeepFlavB > %f)'%(jet,wp_loose))
+        count_medium.append('int(%sDeepFlavB > %f)'%(jet,wp_medium))
+        count_tight.append('int(%sDeepFlavB > %f)'%(jet,wp_tight))
+
+    nloose = '+'.join(count_loose)
+    nmedium = '+'.join(count_medium)
+    ntight = '+'.join(count_tight)
+
+
+    df = df.Define('nloosebtags',nloose)
+    df = df.Define('nmediumbtags',nmedium)
+    df = df.Define('ntightbtags',ntight)
+
+    return df
+
+categories = {
+              'nAK8_0_failLoose' : 'nprobejets == 0 && nloosebtags < 6 && nloosebtags >= 5',  
+              'nAK8_0_passLoose' : 'nprobejets == 0 && nloosebtags >= 6',  
+              'nAK8_1' : 'nprobejets == 1',
+              'nAK8_1p' : 'nprobejets >= 1',
+              'nAK8_2p' : 'nprobejets >= 2',
+        }
+
+regions = {'SR' : 'fatJet1Mass > 80 && fatJet1Mass < 150',
+           'CR' : 'fatJet1Mass < 80 || fatJet1Mass > 150',
+           'inclusive' : 'h1_t3_mass > 70',
+        }
+
+pnets = {'loose' : 'fatJet1PNetXbb > 0.95', 
+        'medium' : 'fatJet1PNetXbb > 0.975',
+        'tight' : 'fatJet1PNetXbb > 0.985',
+        }
+
+variables = mva_variables + ['eventWeight']
 
 if __name__ == '__main__':
-    year = '2016APV'
-    #path = '/isilon/data/users/mstamenk/eos-triple-h/v23/mva-inputs-HLT-TripleBTagCSV-Calib-v23-inclusive-loose-wp-0ptag-%s-btagSF'%(year)
-    #path = '/isilon/data/users/mstamenk/eos-triple-h/v23/mva-inputs-HLT-TripleBTagCSV-MVAInputs-v23-inclusive-loose-wp-0ptag-%s-btagSF'%year
-    #path = '/isilon/data/users/mstamenk/eos-triple-h/v23/mva-inputs-HLT-TripleBTagCSV-MVAInputs-TTWeights-v23-inclusive-loose-wp-0ptag-%s-btagSF'%year
-    path = '/isilon/data/users/mstamenk/eos-triple-h/v24/mva-inputs-HLT-inputs-for-MVA-training-v24-inclusive-loose-wp-0ptag-%s'%year
+    #year = '2016APV'
+    #year = '2016'
+    #year = '2017'
+    year = '2018'
+    if '2016APV' in year:
+        ROOT.gInterpreter.Declare(triggersCorrections[year.replace('APV','')][0])
+    else:
+        ROOT.gInterpreter.Declare(triggersCorrections[year][0])
+    
+    lumi = luminosities[year]
+
+
+    version = 'v26'
+    #path = '/isilon/data/users/mstamenk/eos-triple-h/v25/mva-inputs-HLT-fit-inputs-all-fixes-v25-inclusive-loose-wp-0ptag-%s'%year
+    path = '/isilon/data/users/mstamenk/eos-triple-h/v26/mva-inputs-%s/inclusive_resolved/'%year
     signal_vector = ROOT.std.vector('string')()
     background_vector = ROOT.std.vector('string')()
 
-    scans = get_scans(year)
-    scan = scans['LLLLLL']
 
     for f in ['GluGluToHHHTo6B_SM.root']:
         signal_vector.push_back(path + '/' + f)
 
     signal_samples = [signal_vector, 'signal']
 
-    for f in ['QCD.root','TT.root','WJetsToQQ.root','WWTo4Q.root','WWW.root','WWZ.root','WZZ.root','ZJetsToQQ.root','ZZTo4Q.root','ZZZ.root']:
+    for f in ['QCD.root','QCD_bEnriched.root','TTToHadronic.root','TTToSemiLeptonic.root','WJetsToQQ.root','WWTo4Q.root','WWW.root','WWZ.root','WZZ.root','ZJetsToQQ.root','ZZTo4Q.root','ZZZ.root']:
     #for f in ['QCD.root','TT.root','WJetsToQQ.root','WWTo4Q.root','WWW.root','WZZ.root','ZJetsToQQ.root','ZZTo4Q.root','ZZZ.root']:
         background_vector.push_back(path + '/' + f)
     background_samples = [background_vector, 'background']
+
+    category = 'nAK8_0_failLoose'
+    region = 'inclusive'
+    pnet = 'inclusive'
+
+    output = '%s_%s_%s_%s_%s'%(version,year,category,region,pnet)
+    if not os.path.isdir(output):
+        os.mkdir(output)
 
     for files, label in [signal_samples,background_samples]:
         print(">>> Extract the training and testing events for {} from the {} dataset.".format(label, files))
         df = ROOT.RDataFrame('Events',files)
 
-        cut = scan[0]
-        dt_weight = scan[1]
+        #  add variables for df
+        df = initialise_df(df,year)
 
-        df = df.Filter(cut, 'LLLLL cut')
-        dt_weight = dt_weight.replace('eventWeight','eventWeightBTagCorrected')
+        # Category
+        
+        df = df.Filter(categories[category])
+        
+        # SR
+        df = df.Filter(regions[region])
 
-        tt_weight = scan[2]
-        tt_weight = tt_weight.replace('eventWeight','eventWeightBTagCorrected')
-        print(cut)
-        print(dt_weight)
-        print(tt_weight)
+        # PNet cut for loose
+        if 'inclusive' not in pnet:
+            df = df.Filter(pnets[pnet])
 
-        df = df.Define('dtWeight',dt_weight)
-        df = df.Define('ttWeight',tt_weight)
+
+        df,masses,pts,etas,phis = add_hhh_variables(df)
+        print(masses,pts,etas,phis)
+
 
         report = df.Report()
+        report.Print()
 
-        columns = ROOT.std.vector["string"](variables)
+        save_variables = variables + masses + pts + etas + phis
 
-        df.Filter("event % 2 == 0", "Select even events for training").Snapshot('Events', year + '/' + 'train_%s.root'%label,columns)
-        df.Filter("event % 2 == 1", "Select even events for testing").Snapshot('Events', year + '/' + 'test_%s.root'%label,columns)
+        columns = ROOT.std.vector["string"](save_variables)
+        #columns = ROOT.std.vector["string"](variables)
+
+        df.Filter("event % 2 == 0", "Select even events for training").Snapshot('Events', output + '/' + 'train_%s.root'%label,columns)
+        df.Filter("event % 2 == 1", "Select even events for testing").Snapshot('Events', output + '/' + 'test_%s.root'%label,columns)
         report.Print()
 
 
