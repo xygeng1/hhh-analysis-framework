@@ -90,6 +90,24 @@ One can also inspect the yields on the different categories with the bellow.
 - XGBoost based training scripts are [here]()
 - @Marko add instructions to TMVA
 
+# Instructions to run TMVA
+First step is to fetch the data samples and save a train / test for signal and background. 
+
+This can be done in the `prepare_datasets_boosted.py` (also usable for resolved)
+
+```
+python prepare_datasets_boosted.py
+```
+
+In the script, one needs to specify the paths to the resolved or boosted samples and what selection to apply.
+
+Once the training and testing sets a completed, one can use the script `train_bdt_resolved.py` to do the training. 
+
+```
+python train_bdt_resolved.py --year run2 --nTrees 200 --maxDepth 3 --nCuts 50 --minNodeSize 5
+```
+
+
 # Datacards maker
 
 - See [here]()
