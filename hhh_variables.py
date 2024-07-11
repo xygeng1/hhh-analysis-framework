@@ -59,8 +59,8 @@ def add_hhh_variables(df):
         pt = 'pt%s%s'%(j1,j2)
         eta = 'eta%s%s'%(j1,j2)
         phi = 'phi%s%s'%(j1,j2)
-        df = df.Define(mass, 'computemH(0,%s)'%','.join(variables))
-        df = df.Define(pt, 'computemH(1,%s)'%','.join(variables))
+        df = df.Define(mass, 'computemH(0,%s)/h1_t3_mass'%','.join(variables))
+        df = df.Define(pt, 'computemH(1,%s)/h1_t3_pt'%','.join(variables))
         df = df.Define(eta, 'computemH(2,%s)'%','.join(variables))
         df = df.Define(phi, 'computemH(3,%s)'%','.join(variables))
 

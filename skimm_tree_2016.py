@@ -31,8 +31,8 @@ from hhh_variables import add_hhh_variables
 from optparse import OptionParser
 parser = OptionParser()
 # parser.add_option("--base_folder ", type="string", dest="base", help="Folder in where to look for the categories", default='/eos/cms/store/group/phys_higgs/cmshhh/v33/mva-inputs-2017-categorisation-spanet-boosted-classification/')
-parser.add_option("--base_folder ", type="string", dest="base", help="Folder in where to look for the categories", default='/eos/cms/store/group/phys_higgs/cmshhh/v33/mva-inputs-2018-categorisation-spanet-boosted-classification/')
-# parser.add_option("--base_folder ", type="string", dest="base", help="Folder in where to look for the categories", default='/eos/cms/store/group/phys_higgs/cmshhh/v33-additional-samples/mva-inputs-2018-categorisation-spanet-boosted-classification/')
+parser.add_option("--base_folder ", type="string", dest="base", help="Folder in where to look for the categories", default='/eos/cms/store/group/phys_higgs/cmshhh/v33/mva-inputs-2016-categorisation-spanet-boosted-classification/')
+# parser.add_option("--base_folder ", type="string", dest="base", help="Folder in where to look for the categories", default='/eos/cms/store/group/phys_higgs/cmshhh/v33-additional-samples/mva-inputs-2016-categorisation-spanet-boosted-classification/')
 parser.add_option("--category ", type="string", dest="category", help="Category to compute it. if no argument is given will do all", default='none')
 parser.add_option("--skip_do_trees", action="store_true", dest="skip_do_trees", help="Write...", default=False)
 parser.add_option("--skip_do_histograms", action="store_true", dest="skip_do_histograms", help="Write...", default=False)
@@ -486,7 +486,7 @@ selections = {
         "ProbHHH6b_3bh0h_inclusive"              : {
         "sel" : "(IndexMaxProb == 1 && IndexMaxCat == 1 )",
         "label" : "ProbHHH ",
-        "doSR" : "&& ProbMultiH > 0.0 ",
+        "doSR" : "&& ProbHHH > 0.0 ",
         "doCR" : "&& (ProbMultiH > 0. && ht > 450 )",
         "dataset" : "-weights",
         },
@@ -592,7 +592,7 @@ selections = {
         "sel" : "(IndexMaxProb == 7 && IndexMaxCat == 2 )",
         "label" : "ProbHHH ",
         "doSR" : "&& ProbHHH > 0.0 ",
-        "doCR" : "&& (ProbMultiH > 0. && ht > 450 )",
+        "doCR" : "&& (ht > 450)",
         "dataset" : "-weights",
         },
 
@@ -600,7 +600,7 @@ selections = {
         "sel" : "(IndexMaxProb == 7 && IndexMaxCat == 3 )",
         "label" : "ProbHHH ",
         "doSR" : "&& ProbHHH > 0.0 ",
-        "doCR" : "&& (ProbMultiH > 0. && ht > 450 )",
+        "doCR" : "&& (ht > 450)",
         "dataset" : "-weights",
         },
 
@@ -608,7 +608,7 @@ selections = {
         "sel" : "(IndexMaxProb == 7 && IndexMaxCat == 4 )",
         "label" : "ProbHHH ",
         "doSR" : "&& ProbHHH > 0.0 ",
-        "doCR" : "&& (ProbMultiH > 0. && ht > 450 )",
+        "doCR" : "&& (ht > 450)",
         "dataset" : "-weights",
         },
 
@@ -616,7 +616,7 @@ selections = {
         "sel" : "(IndexMaxProb == 7 && IndexMaxCat == 5)",
         "label" : "ProbHHH ",
         "doSR" : "&& ProbHHH > 0.0  ",
-        "doCR" : "&& (ProbHHH > 0. && ht > 450 && (nmediumbtags >= 4 || nprobejets >= 1) )",
+        "doCR" : "&& (ht > 450)",
         "dataset" : "-weights",
         },
 
@@ -624,56 +624,56 @@ selections = {
         "sel" : "(IndexMaxProb == 7 && IndexMaxCat == 6)",
         "label" : "ProbHHH ",
         "doSR" : "&& ProbHHH > 0.0 ",
-        "doCR" : "&& (ProbHHH > 0. && ht > 450 && (nmediumbtags >= 4 || nprobejets >= 1) )",
+        "doCR" : "&& (ht > 450)",
         "dataset" : "-weights",
         },
         "ProbHH4b_0bh2h_inclusive"              : {
         "sel" : "(IndexMaxProb == 7 && IndexMaxCat == 7)",
         "label" : "ProbHHH ",
         "doSR" : "&& ProbHHH > 0.0 ",
-        "doCR" : "&& (ProbHHH > 0. && ht > 450 && (nmediumbtags >= 4 || nprobejets >= 1) )",
+        "doCR" : "&& (ht > 450)",
         "dataset" : "-weights",
         },
         "ProbHH4b_1bh0h_inclusive"              : {
         "sel" : "(IndexMaxProb == 7 && IndexMaxCat == 8)",
         "label" : "ProbHHH ",
         "doSR" : "&& ProbHHH > 0.0 ",
-        "doCR" : "&& (ProbHHH > 0. && nmediumbtags >= 4)",
+        "doCR" : "&& (ht > 450)",
         "dataset" : "-weights",
         },
         "ProbHH4b_0bh1h_inclusive"              : {
         "sel" : "(IndexMaxProb == 7 && IndexMaxCat == 9)",
         "label" : "ProbHHH ",
         "doSR" : "&& ProbHHH > 0.0 ",
-        "doCR" : "&& (ProbHHH > 0. && nmediumbtags >= 4)",
+        "doCR" : "&& (ht > 450)",
         "dataset" : "-weights",
         },
         "ProbHH4b_0bh0h_inclusive"              : {
         "sel" : "(IndexMaxProb == 7 && IndexMaxCat == 0)",
         "label" : "ProbHHH ",
         "doSR" : "&& ProbHHH > 0.0 ",
-        "doCR" : "&& (ProbMultiH > 0. && ht > 450 )",
+        "doCR" : "&& (ht > 450)",
         "dataset" : "-weights",
         },
         "ProbHH4b_3Higgs_inclusive"              : {
         "sel" : "(IndexMaxProb == 7 && (IndexMaxCat == 1 || IndexMaxCat == 2 || IndexMaxCat == 3 || IndexMaxCat == 4))",
         "label" : "ProbHHH ",
         "doSR" : "&& ProbHHH > 0.0  ",
-        "doCR" : "&& (ProbMultiH > 0. && ht > 450 )",
+        "doCR" : "&& (ht > 450)",
         "dataset" : "-weights",
         },
         "ProbHH4b_2Higgs_inclusive"              : {
         "sel" : "(IndexMaxProb == 7 && (IndexMaxCat == 5 || IndexMaxCat == 6 || IndexMaxCat == 7 ))",
         "label" : "ProbHHH ",
         "doSR" : "&& ProbHHH > 0.0  ",
-        "doCR" : "&& (ProbMultiH > 0. && ht > 450 )",
+        "doCR" : "&& (ht > 450)",
         "dataset" : "-weights",
         },
         "ProbHH4b_1Higgs_inclusive"              : {
         "sel" : "(IndexMaxProb == 7 && (IndexMaxCat == 8 || IndexMaxCat == 9 ))",
         "label" : "ProbHHH ",
         "doSR" : "&& ProbHHH > 0.0 ",
-        "doCR" : "&& (ProbMultiH > 0. && ht > 450 )",
+        "doCR" : "&& (ht > 450)",
         "dataset" : "-weights",
         },
 
@@ -731,7 +731,7 @@ if do_CR :
 inputTree = 'Events'
 
 # procstodo = ["DYJetsToLL","GluGluToHHHTo4B2Tau_SM","GluGluToHHTo2B2Tau_SM","GluGluToHHTo4B_cHHH1","TTToSemiLeptonic","WJetsToLNu_0J","WJetsToLNu_1J","WJetsToLNu_2J", "ZZTo4Q", "WWTo4Q", "ZJetsToQQ", "WJetsToQQ", "TTToHadronic","TTTo2L2Nu", "QCD", "data_obs" , "GluGluToHHHTo6B_SM","WWW","WWZ","WZZ","ZZZ"]
-procstodo = ["GluGluToHHTo4B_cHHH1","data_obs","GluGluToHHHTo6B_SM","QCD_datadriven_data","GluGluToHHHTo4B2Tau_SM","GluGluToHHTo2B2Tau_SM"]
+procstodo = ["GluGluToHHTo4B_cHHH1","data_obs","GluGluToHHHTo6B_SM","QCD_datadriven","GluGluToHHHTo4B2Tau_SM","GluGluToHHTo2B2Tau_SM"]
 if not process_to_compute == 'none' :
     procstodo     = [process_to_compute]
     skip_do_plots = True
@@ -798,7 +798,7 @@ for selection in selections.keys() :
     ## do that in a utils function
     datahist = proctodo
     if proctodo == "data_obs" :
-        if year == '2018' or '2016' in year:
+        if year == '2018' or '2016' or '2016APV'in year:
             datahist = 'JetHT'
         else:
             datahist = 'BTagCSV'
@@ -807,7 +807,8 @@ for selection in selections.keys() :
 
     dataset = selections[selection]["dataset"] # inclusive_resolved or inclusive_boosted
     list_proc=glob.glob("{}/inclusive{}/{}.root".format(input_tree,dataset,datahist))
-    print(list_proc)
+    for file_path in list_proc:
+        print(file_path)
     print("Will create %s" % outtree)
 
 
@@ -832,8 +833,8 @@ for selection in selections.keys() :
         
         if firstProc:
             #init_bdt(chunk_df,year)
-            # init_bdt(chunk_df,year)
-            # init_bdt_boosted(chunk_df,year)
+            init_bdt(chunk_df,year)
+            init_bdt_boosted(chunk_df,year)
 
             firstProc = False
         try:
@@ -915,7 +916,7 @@ for selection in selections.keys() :
         lumi = luminosities[year]
         # Re-definition of event weight to be used on v28 - will be fixed
         if 'JetHT' in datahist: cutWeight = '1' 
-        elif'QCD_datadriven' in datahist: cutWeight = '1' 
+        elif 'QCD_datadriven' in proc: cutWeight = '1' 
         else: cutWeight = '(%f * xsecWeight * l1PreFiringWeight * puWeight * genWeight * triggerSF)'%(lumi)
         chunk_df = chunk_df.Define('eventWeight2', cutWeight)
         chunk_df = chunk_df.Define('totalWeight', string_multiply)
@@ -1008,16 +1009,14 @@ for selection in selections.keys() :
                 try:
                     #h_tmp = chunk_df.Fill(template, [char_var, 'totalWeight'])
                     f_out.cd()
-                    print("2222222")
                     h_tmp = chunk_df.Filter("%s > %s"%(char_var,xmin)).Histo1D((char_var,char_var,nbins,array('d',define_bins)),char_var,'totalWeight')
-                    print("33333333333")
                     # h_tmp = chunk_df.Filter("%s > %s"%(char_var,xmin)).Histo1D((char_var,char_var,nbins,xmin,xmax),char_var, 'totalWeight')
                     if proctodo == "data_obs":
                         data_value = h_tmp.Integral()
                         print("already get the data value !!!!!!!!!!!!!")
                         print(h_tmp.Integral())
 
-                    if proctodo == "QCD_datadriven_data":
+                    if proctodo == "QCD_datadriven":
                         print(h_tmp.Integral())
                         h_tmp.Scale(data_value/h_tmp.Integral())
                         print("already scale the QCD !!!!!!!!!!!!!")
@@ -1047,18 +1046,16 @@ for selection in selections.keys() :
 
   if not skip_do_plots :
       # Draw the data/MC to this selection
-      year = 'run2'
-      path_to_plots = '/eos/user/x/xgeng/workspace/HHH/CMSSW_12_5_2/src/hhh-analysis-framework/output/v33_new/sample_original_slim/%s/'%(year)
+      path_to_plots = '/eos/user/x/xgeng/workspace/HHH/CMSSW_12_5_2/src/hhh-analysis-framework/plots_addmva/v33_new/%s/'%(year)
+      
       output_folder_draw = "{}/{}_{}".format(path_to_plots,selection,additional_label)
-      input_folder_for_plots  = output_folder_draw
-
       if not path.exists(output_folder_draw) :
         procs=subprocess.Popen(['mkdir %s' % output_folder],shell=True,stdout=subprocess.PIPE)
         out = procs.stdout.read()
       print("made directory %s" % output_folder_draw)
 
     #   command = "python3 draw_data_mc_categories.py --input_folder %s --plot_label '%s (%s)' --output_folder %s" % (output_histos.replace('histograms',''), selections[selection]["label"], additional_label,output_folder_draw)
-      command = "python3 draw_histograms.py --input_folder %s --plot_label '%s (%s)' --output_folder %s" % (input_folder_for_plots, selections[selection]["label"], additional_label,output_folder_draw)
+      command = "python3 draw_data_mc_categories.py --input_folder %s --plot_label '%s (%s)' --output_folder %s" % (output_histos.replace('histograms',''), selections[selection]["label"], additional_label,output_folder_draw)
       #if "0PFfat" in selection :
       #command = command + " --log"
       print(command)
@@ -1066,13 +1063,24 @@ for selection in selections.keys() :
       proc=subprocess.Popen([command],shell=True,stdout=subprocess.PIPE)
       out = proc.stdout.read()
 
+#   if not skip_do_correct :
+#     path_to_histograms = '/eos/user/x/xgeng/workspace/HHH/CMSSW_12_5_2/src/hhh-analysis-framework/output/v33_new/%s'%(year)
+#     Higgs_number_strings = ["2Higgs","3Higgs"]
+#     for Higgs_number in Higgs_number_strings: 
+#         file_1Higgs = "{}/ProbHHH6b_1Higgs_inclusive_/histograms/histograms_{}.root".format(path_to_histograms,do_limit_input)
+#         file_2Higgs = "{}/ProbHHH6b_{}_inclusive_/histograms/histograms_{}.root".format(path_to_histograms,Higgs_number,do_limit_input)
+#         path = output_histos
+#         Unc_Shape(file_1Higgs,file_2Higgs,do_limit_input,Higgs_number,path,year)
+
   if not skip_do_correct :
-    path_to_histograms = '/eos/user/x/xgeng/workspace/HHH/CMSSW_12_5_2/src/hhh-analysis-framework/output/v33_new/%s'%(year)
-    Higgs_number_strings = ["3Higgs","2Higgs","3bh0h","2bh1h","1bh2h","0bh3h"]
-    # Higgs_number_strings = ["3Higgs"]
+    # path_to_histograms = '/eos/user/x/xgeng/workspace/HHH/CMSSW_12_5_2/src/hhh-analysis-framework/output/v33_new/2016_merged'
+    path_to_histograms = '/eos/user/x/xgeng/workspace/HHH/CMSSW_12_5_2/src/hhh-analysis-framework/output/v33_new/run2'
+    Higgs_number_strings = ["2bh0h","1bh1h","0bh2h","3bh0h","2bh1h","1bh2h","0bh3h","3Higgs","2Higgs"]
+    # Higgs_number_strings = []
+
     for Higgs_number in Higgs_number_strings: 
-        file_1Higgs = "{}/ProbHHH6b_1Higgs_inclusive_/histograms/histograms_{}.root".format(path_to_histograms,do_limit_input)
-        file_2Higgs = "{}/ProbHHH6b_{}_inclusive_/histograms/histograms_{}.root".format(path_to_histograms,Higgs_number,do_limit_input)
+        file_1Higgs = "{}/ProbHHH6b_1Higgs_inclusive_CR/histograms/histograms_{}.root".format(path_to_histograms,do_limit_input)
+        file_2Higgs = "{}/ProbHHH6b_{}_inclusive_CR/histograms/histograms_{}.root".format(path_to_histograms,Higgs_number,do_limit_input)
         Unc_Shape(file_1Higgs,file_2Higgs,do_limit_input,path_to_histograms,Higgs_number,year)
     
     

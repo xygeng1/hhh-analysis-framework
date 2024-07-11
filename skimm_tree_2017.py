@@ -31,8 +31,8 @@ from hhh_variables import add_hhh_variables
 from optparse import OptionParser
 parser = OptionParser()
 # parser.add_option("--base_folder ", type="string", dest="base", help="Folder in where to look for the categories", default='/eos/cms/store/group/phys_higgs/cmshhh/v33/mva-inputs-2017-categorisation-spanet-boosted-classification/')
-parser.add_option("--base_folder ", type="string", dest="base", help="Folder in where to look for the categories", default='/eos/cms/store/group/phys_higgs/cmshhh/v33/mva-inputs-2018-categorisation-spanet-boosted-classification/')
-# parser.add_option("--base_folder ", type="string", dest="base", help="Folder in where to look for the categories", default='/eos/cms/store/group/phys_higgs/cmshhh/v33-additional-samples/mva-inputs-2018-categorisation-spanet-boosted-classification/')
+parser.add_option("--base_folder ", type="string", dest="base", help="Folder in where to look for the categories", default='/eos/cms/store/group/phys_higgs/cmshhh/v33/mva-inputs-2017-categorisation-spanet-boosted-classification/')
+# parser.add_option("--base_folder ", type="string", dest="base", help="Folder in where to look for the categories", default='/eos/cms/store/group/phys_higgs/cmshhh/v33-additional-samples/mva-inputs-2017-categorisation-spanet-boosted-classification/')
 parser.add_option("--category ", type="string", dest="category", help="Category to compute it. if no argument is given will do all", default='none')
 parser.add_option("--skip_do_trees", action="store_true", dest="skip_do_trees", help="Write...", default=False)
 parser.add_option("--skip_do_histograms", action="store_true", dest="skip_do_histograms", help="Write...", default=False)
@@ -486,7 +486,7 @@ selections = {
         "ProbHHH6b_3bh0h_inclusive"              : {
         "sel" : "(IndexMaxProb == 1 && IndexMaxCat == 1 )",
         "label" : "ProbHHH ",
-        "doSR" : "&& ProbMultiH > 0.0 ",
+        "doSR" : "&& ProbHHH > 0.0 ",
         "doCR" : "&& (ProbMultiH > 0. && ht > 450 )",
         "dataset" : "-weights",
         },
@@ -616,7 +616,7 @@ selections = {
         "sel" : "(IndexMaxProb == 7 && IndexMaxCat == 5)",
         "label" : "ProbHHH ",
         "doSR" : "&& ProbHHH > 0.0  ",
-        "doCR" : "&& (ProbHHH > 0. && ht > 450 && (nmediumbtags >= 4 || nprobejets >= 1) )",
+        "doCR" : "&& (ProbMultiH > 0. && ht > 450 )",
         "dataset" : "-weights",
         },
 
@@ -731,7 +731,7 @@ if do_CR :
 inputTree = 'Events'
 
 # procstodo = ["DYJetsToLL","GluGluToHHHTo4B2Tau_SM","GluGluToHHTo2B2Tau_SM","GluGluToHHTo4B_cHHH1","TTToSemiLeptonic","WJetsToLNu_0J","WJetsToLNu_1J","WJetsToLNu_2J", "ZZTo4Q", "WWTo4Q", "ZJetsToQQ", "WJetsToQQ", "TTToHadronic","TTTo2L2Nu", "QCD", "data_obs" , "GluGluToHHHTo6B_SM","WWW","WWZ","WZZ","ZZZ"]
-procstodo = ["GluGluToHHTo4B_cHHH1","data_obs","GluGluToHHHTo6B_SM","QCD_datadriven_data","GluGluToHHHTo4B2Tau_SM","GluGluToHHTo2B2Tau_SM"]
+procstodo = ["GluGluToHHTo4B_cHHH1","data_obs","GluGluToHHHTo6B_SM","QCD_datadriven","GluGluToHHHTo4B2Tau_SM","GluGluToHHTo2B2Tau_SM"]
 if not process_to_compute == 'none' :
     procstodo     = [process_to_compute]
     skip_do_plots = True
@@ -791,24 +791,32 @@ for selection in selections.keys() :
       print("made directory %s" % output_folder)
 
   if not skip_do_trees :
+   print("1111111")
 
    firstProc = True
    for proctodo in procstodo :
+    print("2222222")
 
     ## do that in a utils function
     datahist = proctodo
     if proctodo == "data_obs" :
-        if year == '2018' or '2016' in year:
+        print(year)
+        if year in ['2018', '2016', '2016APV']:
             datahist = 'JetHT'
+            print("4444")
+            print(year)
+
         else:
             datahist = 'BTagCSV'
+            print("33331")
 
     outtree = "{}/{}_{}/{}.root".format(output_tree,selection,additional_label,proctodo)
 
     dataset = selections[selection]["dataset"] # inclusive_resolved or inclusive_boosted
     list_proc=glob.glob("{}/inclusive{}/{}.root".format(input_tree,dataset,datahist))
-    print(list_proc)
+    
     print("Will create %s" % outtree)
+    
 
 
     for proc in list_proc :
@@ -914,7 +922,7 @@ for selection in selections.keys() :
         print( "Redefine eventWeight = {}".format(string_multiply))
         lumi = luminosities[year]
         # Re-definition of event weight to be used on v28 - will be fixed
-        if 'JetHT' in datahist: cutWeight = '1' 
+        if 'BTagCSV' in datahist: cutWeight = '1' 
         elif'QCD_datadriven' in datahist: cutWeight = '1' 
         else: cutWeight = '(%f * xsecWeight * l1PreFiringWeight * puWeight * genWeight * triggerSF)'%(lumi)
         chunk_df = chunk_df.Define('eventWeight2', cutWeight)
@@ -998,7 +1006,7 @@ for selection in selections.keys() :
 
                 datahist = proctodo
                 if proctodo == "data_obs" :
-                    if year == '2018' or year == '2016APV201620172018':
+                    if year == '2018' or year == '2016' or year == '2016APV' or year == '2016APV201620172018' :
                         datahist = 'JetHT'
                     else:
                         datahist = 'BTagCSV'
@@ -1008,16 +1016,14 @@ for selection in selections.keys() :
                 try:
                     #h_tmp = chunk_df.Fill(template, [char_var, 'totalWeight'])
                     f_out.cd()
-                    print("2222222")
                     h_tmp = chunk_df.Filter("%s > %s"%(char_var,xmin)).Histo1D((char_var,char_var,nbins,array('d',define_bins)),char_var,'totalWeight')
-                    print("33333333333")
                     # h_tmp = chunk_df.Filter("%s > %s"%(char_var,xmin)).Histo1D((char_var,char_var,nbins,xmin,xmax),char_var, 'totalWeight')
                     if proctodo == "data_obs":
                         data_value = h_tmp.Integral()
                         print("already get the data value !!!!!!!!!!!!!")
                         print(h_tmp.Integral())
 
-                    if proctodo == "QCD_datadriven_data":
+                    if proctodo == "QCD_datadriven":
                         print(h_tmp.Integral())
                         h_tmp.Scale(data_value/h_tmp.Integral())
                         print("already scale the QCD !!!!!!!!!!!!!")
@@ -1047,18 +1053,16 @@ for selection in selections.keys() :
 
   if not skip_do_plots :
       # Draw the data/MC to this selection
-      year = 'run2'
-      path_to_plots = '/eos/user/x/xgeng/workspace/HHH/CMSSW_12_5_2/src/hhh-analysis-framework/output/v33_new/sample_original_slim/%s/'%(year)
+      path_to_plots = '/eos/user/x/xgeng/workspace/HHH/CMSSW_12_5_2/src/hhh-analysis-framework/plots_addmva/v33_new/%s/'%(year)
+      
       output_folder_draw = "{}/{}_{}".format(path_to_plots,selection,additional_label)
-      input_folder_for_plots  = output_folder_draw
-
       if not path.exists(output_folder_draw) :
         procs=subprocess.Popen(['mkdir %s' % output_folder],shell=True,stdout=subprocess.PIPE)
         out = procs.stdout.read()
       print("made directory %s" % output_folder_draw)
 
     #   command = "python3 draw_data_mc_categories.py --input_folder %s --plot_label '%s (%s)' --output_folder %s" % (output_histos.replace('histograms',''), selections[selection]["label"], additional_label,output_folder_draw)
-      command = "python3 draw_histograms.py --input_folder %s --plot_label '%s (%s)' --output_folder %s" % (input_folder_for_plots, selections[selection]["label"], additional_label,output_folder_draw)
+      command = "python3 draw_data_mc_categories.py --input_folder %s --plot_label '%s (%s)' --output_folder %s" % (output_histos.replace('histograms',''), selections[selection]["label"], additional_label,output_folder_draw)
       #if "0PFfat" in selection :
       #command = command + " --log"
       print(command)

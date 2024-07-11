@@ -6,7 +6,7 @@ ROOT.gROOT.SetBatch(ROOT.kTRUE)
 ROOT.ROOT.EnableImplicitMT()
 
 
-path = '/isilon/data/users/mstamenk/eos-triple-h/' 
+path = '/eos/user/x/xgeng/workspace/HHH/CMSSW_12_5_2/src/hhh-analysis-framework/output' 
 version = 'v24'
 
 

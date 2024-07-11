@@ -10,14 +10,14 @@ from array import array
 # argument parser
 import argparse
 parser = argparse.ArgumentParser(description='Args')
-parser.add_argument('-v','--version', default='v25') # version of NanoNN production
+parser.add_argument('-v','--version', default='v24') # version of NanoNN production
 parser.add_argument('--year', default='2018') # year
 parser.add_argument('--region', default = 'inclusive') # region: nFJ0, nFJ1, nFJ2, inclsuive, nFJ1p(= 1+2+3 fatjets)
-parser.add_argument('--tag', default = '6tag') # n b-tags on AK4 jets using DeepJet
+parser.add_argument('--tag', default = '0ptag') # n b-tags on AK4 jets using DeepJet
 parser.add_argument('--wp', default = 'loose') # b-tagging working point: loose, medium, tight
 parser.add_argument('--f_in', default = 'GluGluToHHHTo6B_SM') # input samples
 #parser.add_argument('--inputs_path', default = '/afs/cern.ch/work/m/mstamenk/public/forPKU/') # path of inputs after NanoNN
-parser.add_argument('--inputs_path', default = '/eos/user/m/mstamenk/CxAOD31run/hhh-6b/v25/2017/gt5bloose') # path of inputs after NanoNN
+parser.add_argument('--inputs_path', default = '/eos/user/m/mstamenk/CxAOD31run/hhh-6b') # path of inputs after NanoNN
 parser.add_argument('--outputs_path', help='Please specify output path for histograms / mva inputs location to be stored', default = '/eos/user/x/xgeng/workspace/HHH/CMSSW_12_5_2/src/hhh-analysis-framework/output') # output path for histograms and mva inputs
 parser.add_argument('--doMVAInputs', action = 'store_true') # store MVA inputs
 parser.add_argument('--doHistograms', action = 'store_true') # store histograms
@@ -37,8 +37,7 @@ ROOT.gROOT.SetBatch(ROOT.kTRUE)
 
 # get inputs 
 version = args.version
-#path = args.inputs_path + '/' + 'samples-%s-%s-nanoaod'%(version,args.year) 
-path = args.inputs_path
+path = args.inputs_path + '/' + 'samples-%s-%s-nanoaod'%(version,args.year) 
 #path = args.inputs_path + '/' + 'samples-%s-%s-%s-wp-%s-%s'%(version,args.region,args.wp,args.tag,args.year) + '/'
 #path = args.inputs_path + '/' + 'mva-inputs-HLT-selection-%s-inclusive-loose-wp-0ptag-%s'%(version,args.year) + '/'
 print(path)
@@ -117,17 +116,15 @@ cutSignalJets = '(bcand1Pt > 40 && bcand3Pt > 40 && bcand5Pt > 40)'
 
 
 # Event selection
-# df_hlt = df.Filter(cutHLT, "Pass HLT trigger")
-# df_jets = df_hlt.Filter(cutJets, "Pt and Eta, jet id and pu id cuts on b-candidates")
-# #if 'v22' in args.version or 'v23' in args.version:
-# df_jets = df_jets.Filter(cutJetIds, "jet id")
-# df_jets = df_jets.Filter(cutPuId, "pu id")
-# df_region = df_jets.Filter(cutRegion, "Pass region cut")
-# df_tags = df_region.Filter(cutTag, "Pass b-tagging")
-# df = df_tags.Filter(cutSignalJets,"Pass leading jet pT > 40")
+df_hlt = df.Filter(cutHLT, "Pass HLT trigger")
+df_jets = df_hlt.Filter(cutJets, "Pt and Eta, jet id and pu id cuts on b-candidates")
+#if 'v22' in args.version or 'v23' in args.version:
+df_jets = df_jets.Filter(cutJetIds, "jet id")
+df_jets = df_jets.Filter(cutPuId, "pu id")
+df_region = df_jets.Filter(cutRegion, "Pass region cut")
+df_tags = df_region.Filter(cutTag, "Pass b-tagging")
+df = df_tags.Filter(cutSignalJets,"Pass leading jet pT > 40")
 #df = df.Filter('h_fit_mass > 80 && h_fit_mass < 150', "Pass mass cut window")
-
-df = df.Filter(cutRegion, "Pass region cut")
 
 # Add b-tagging SFs
 #if args.year == '2016' or args.year == '2016PostAPV':

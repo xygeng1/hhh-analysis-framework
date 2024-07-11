@@ -2,29 +2,41 @@
 
 import os, ROOT
 
-root_path = os.environ['MYROOT']
+#root_path = os.environ['MYROOT']
+root_path = '/eos/user/x/xgeng/workspace/HHH/CMSSW_12_5_2/src/hhh-analysis-framework'
 #root_path = '/isilon/data/users/mstamenk/hhh-6b-producer/master/CMSSW_12_5_2/src/hhh-master/hhh-analysis-framework/'
 
 path_bdt_xml = '%s/data/bdt/'%(root_path)
+path_bdt_xml_1 = '%s/bdt-framework/dataset-resolved-run2-nTrees-200-maxDepth-3-nCuts-50-minNodeSize-5-adaBoostBeta-0.15nAK8_0_4L2M-loose_have_nmedium/weights/'%(root_path)
+path_bdt_xml_2 = '%s/bdt-framework/dataset-resolved-run2-nTrees-200-maxDepth-3-nCuts-50-minNodeSize-5-adaBoostBeta-0.15nAK8_0_4L2M-loose_inverted_have_nmedium/weights/'%(root_path)
+#/eos/user/x/xgeng/workspace/HHH/CMSSW_12_5_2/src/hhh-analysis-framework/bdt-framework/dataset-resolved-run2-nTrees-200-maxDepth-3-nCuts-50-minNodeSize-5-adaBoostBeta-0.15nAK8_0_6L-loose/weights
+#the path to run2 6L SR
 
 bdts_xml = {
-            '2016APV' : [path_bdt_xml+'TMVAClassification_2016APV_v24_regular.xml',path_bdt_xml+'TMVAClassification_2016APV_v24_inverted.xml'],
-            '2016' : [path_bdt_xml+'TMVAClassification_2016_v24_regular.xml',path_bdt_xml+'TMVAClassification_2016_v24_inverted.xml'],
-            '2017' : [path_bdt_xml+'TMVAClassification_2017_v24_regular.xml',path_bdt_xml+'TMVAClassification_2017_v24_inverted.xml'],
-            '2018' : [path_bdt_xml+'TMVAClassification_2018_v24_regular.xml',path_bdt_xml+'TMVAClassification_2018_v24_inverted.xml'],
+            # '2016APV' : [path_bdt_xml+'TMVAClassification_2016APV_v24_regular.xml',path_bdt_xml+'TMVAClassification_2016APV_v24_inverted.xml'],
+            # '2016' : [path_bdt_xml+'TMVAClassification_2016_v24_regular.xml',path_bdt_xml+'TMVAClassification_2016_v24_inverted.xml'],
+            # '2017' : [path_bdt_xml+'TMVAClassification_2017_v24_regular.xml',path_bdt_xml+'TMVAClassification_2017_v24_inverted.xml'],
+            # '2018' : [path_bdt_xml+'TMVAClassification_2018_v24_regular.xml',path_bdt_xml+'TMVAClassification_2018_v24_inverted.xml'],
+
             #'2017' : ['/isilon/data/users/mstamenk/hhh-6b-producer/CMSSW_12_5_2/src/data/bdt/TMVAClassification_2017_BDT.weights.xml'],
             #'2018' : '/isilon/data/users/mstamenk/hhh-6b-producer/CMSSW_12_5_2/src/data/bdt/TMVAClassification_2018_optimal_BDT.weights.xml'
+            '2016APV' : [path_bdt_xml_1+'TMVAClassification_run2_even_BDT.weights.xml',path_bdt_xml_2+'TMVAClassification_run2_odd_BDT.weights.xml'],
+            '2016' : [path_bdt_xml_1+'TMVAClassification_run2_even_BDT.weights.xml',path_bdt_xml_2+'TMVAClassification_run2_odd_BDT.weights.xml'],
+            '2017' : [path_bdt_xml_1+'TMVAClassification_run2_even_BDT.weights.xml',path_bdt_xml_2+'TMVAClassification_run2_odd_BDT.weights.xml'],
+            '2018' : [path_bdt_xml_1+'TMVAClassification_run2_even_BDT.weights.xml',path_bdt_xml_2+'TMVAClassification_run2_odd_BDT.weights.xml'],
             }
 
 bdts_xml_boosted = {
-            '2016APV' : [path_bdt_xml+'TMVAClassification_2018_v25_regular_boosted.xml',path_bdt_xml+'TMVAClassification_2018_v25_inverted_boosted.xml'],
-            '2016' : [path_bdt_xml+'TMVAClassification_2018_v25_regular_boosted.xml',path_bdt_xml+'TMVAClassification_2018_v25_inverted_boosted.xml'],
-            '2017' : [path_bdt_xml+'TMVAClassification_2018_v25_regular_boosted.xml',path_bdt_xml+'TMVAClassification_2018_v25_inverted_boosted.xml'],
+            '2016APV' : [path_bdt_xml+'TMVAClassification_2016APV_v24_regular.xml',path_bdt_xml+'TMVAClassification_2016APV_v24_inverted.xml'],
+            '2016' : [path_bdt_xml+'TMVAClassification_2016_v24_regular.xml',path_bdt_xml+'TMVAClassification_2016_v24_inverted.xml'],
+            '2017' : [path_bdt_xml+'TMVAClassification_2018_v26_regular_boosted_cut.xml',path_bdt_xml+'TMVAClassification_2018_v26_inverted_boosted_cut.xml'],
             '2018' : [path_bdt_xml+'TMVAClassification_2018_v26_regular_boosted_cut.xml',path_bdt_xml+'TMVAClassification_2018_v26_inverted_boosted_cut.xml'],
             }
 
 def init_bdt(df, year):
     xmlpath_odd, xmlpath_even = bdts_xml[year]
+    print("The bdt path use is:")
+    print(bdts_xml[year])
 
     ROOT.gInterpreter.ProcessLine('''TMVA::Experimental::RReader model_even("{}");'''.format(xmlpath_even))
     nvars = ROOT.model_even.GetVariableNames().size()

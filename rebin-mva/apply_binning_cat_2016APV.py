@@ -14,8 +14,8 @@ import argparse
 parser = argparse.ArgumentParser(description='Args')
 parser.add_argument('-v','--version', default='v33_new')
 parser.add_argument('--year', default='2018')
+parser.add_argument('--path_year', default='2016APV')
 parser.add_argument('--prob', default='ProbHHH6b')
-parser.add_argument('--path_year', default='2018')
 parser.add_argument('--var', default = 'ProbMultiH')
 parser.add_argument('--doSyst', action = 'store_true')
 args = parser.parse_args()
@@ -611,6 +611,7 @@ def get_integral_and_error(hist):
     return integral, error.value
 
 
+
 #path = '/isilon/data/users/mstamenk/eos-triple-h/v28-categorisation/mva-inputs-2018-categorisation-spanet-boosted-classification/'
 path = '/eos/user/x/xgeng/workspace/HHH/CMSSW_12_5_2/src/hhh-analysis-framework/output/%s/sample_cut/%s'%(version,path_year)
 
@@ -621,8 +622,7 @@ prob = args.prob#'ProbHHH6b'
 
 
 
-# for cat in ['%s_3bh0h_inclusive','%s_2bh1h_inclusive','%s_1bh2h_inclusive','%s_0bh3h_inclusive']:
-
+# for cat in ['%s_3bh0h_inclusive','%s_2bh1h_inclusive','%s_1bh2h_inclusive','%s_0bh3h_inclusive']:# variables:
 for cat in ['%s_2bh0h_inclusive','%s_1bh1h_inclusive','%s_0bh2h_inclusive','%s_0bh0h_inclusive','%s_2Higgs_inclusive','%s_1Higgs_inclusive','%s_3Higgs_inclusive','%s_3bh0h_inclusive','%s_2bh1h_inclusive','%s_1bh2h_inclusive','%s_0bh3h_inclusive']:# variables:
 # for cat in ['%s_3bh0h_inclusive','%s_2bh1h_inclusive','%s_1bh2h_inclusive','%s_0bh3h_inclusive','%s_2bh0h_inclusive','%s_1bh1h_inclusive','%s_0bh2h_inclusive','%s_1bh0h_inclusive','%s_0bh1h_inclusive','%s_0bh0h_inclusive','%s_2Higgs_inclusive','%s_1Higgs_inclusive','%s_3Higgs_inclusive']:# variables:
 #for cat in ['%s_2bh0h_inclusive','%s_1bh1h_inclusive','%s_0bh2h_inclusive','%s_1bh0h_inclusive','%s_0bh1h_inclusive','%s_0bh0h_inclusive','%s_2Higgs_inclusive','%s_1Higgs_inclusive','%s_3Higgs_inclusive']:# variables:
@@ -648,8 +648,8 @@ for cat in ['%s_2bh0h_inclusive','%s_1bh1h_inclusive','%s_0bh2h_inclusive','%s_0
 
     binning = binnings[cat]
     cut = categories[cat]
-    # print("binning is aaaaaaaaaaaaahjbjkrgvnrkjvrjierjirjirjrvjvrkrkvmvmvlvmlkmvmvlvvlv")
-    # print(binning)
+    print("binning is aaaaaaaaaaaaahjbjkrgvnrkjvrjierjirjirjrvjvrkrkvmvmvlvmlkmvmvlvvlv")
+    print(binning)
     # break
 
     data_yield = 0

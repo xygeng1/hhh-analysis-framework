@@ -3,7 +3,7 @@
 import os,ROOT
 
 
-path_tt = '/isilon/data/users/mstamenk/hhh-6b-producer/CMSSW_12_5_2/src/eff-maps/mcEff/'
+path_tt = '/eos/user/x/xgeng/workspace/HHH/CMSSW_12_5_2/src/hhh-analysis-framework/eff-maps/mcEff/'
 
 def tt_init(year, f_in):
     ttDir = path_tt + '%s_%s.root'%(f_in,year)

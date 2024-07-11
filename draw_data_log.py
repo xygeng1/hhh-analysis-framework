@@ -2,7 +2,7 @@
 
 import os
 from utils import histograms_dict, hist_properties, addLabel_CMS_preliminary, luminosities
-from array import array
+
 import ROOT
 
 #ROOT.PyConfig.IgnoreCommandLineOptions = True
@@ -35,16 +35,14 @@ output_folder=options.output_folder
 if output_folder == "none" :
     output_folder = input_folder
 
-for era in ['2016APV', '2016', '2017', '2018'] :
+for era in ['2016APV', '2016', '2017', '2018' ,'run2','2016all'] :
     if era in input_folder : year = era
 
-year = 'run2'
 labels = addLabel_CMS_preliminary(luminosities[year])
 
 iPeriod = 0
 datahist   = 'data_obs'
 signalhist = 'GluGluToHHHTo6B_SM'
-signalhist2 = 'GluGluToHHTo4B_cHHH1'
 inputTree = 'Events'
 
 if not os.path.isdir(output_folder):
@@ -52,37 +50,34 @@ if not os.path.isdir(output_folder):
 
 file_data   = "{}/{}.root".format(input_folder, datahist)
 file_signal = "{}/{}.root".format(input_folder, signalhist)
-file_signal2 = "{}/{}.root".format(input_folder, signalhist2)
-
-
 
 chunk_data   = ROOT.RDataFrame(inputTree, file_data)
 chunk_signal = ROOT.RDataFrame(inputTree, file_signal)
-chunk_signal2 = ROOT.RDataFrame(inputTree, file_signal2)
 variables = chunk_data.GetColumnNames()
-
-
-                    
-variables = ROOT.std.vector['string'](["max_eta", "h1_spanet_boosted_eta", "h1_spanet_boosted_mass", 
-                     "h2_spanet_boosted_eta", "h2_spanet_boosted_mass", 
-                     "h3_spanet_boosted_eta", "h3_spanet_boosted_mass","max_eta_Higgs_mass","ProbMultiH"])
+print (variables)
+print(type(variables)) 
 
 #file_data = ROOT.TFile(input_folder + '/' + 'histograms_%s.root'%(datahist))
 #variables = [v.GetName() for v in file_data.GetListOfKeys()]
 #file_data.Close()
 
 if do_log :
-    scale_sig = 1000.0
-    scale_sig2 = 15
+    scale_sig = 1.0
     ypos     = 0.095
 else :
-    scale_sig = 1000.0
-    scale_sig2 = 15
+    scale_sig = 350.0
     ypos     = 0.9
 
+
+print(type(variables)) 
+# variables = ["lep2Eta","fatJet3PNetXbb","met","ProbHHH", "ProbQCD", "ProbTT", "ProbVJets", "ProbVV"]
 for var in variables:
-    if str(var)  != "max_eta_Higgs_mass":
+    # if str(var) != "ProbHHH" and str(var) != "h1_t3_mass" and str(var) != "nloosebtags" and str(var) != "lep2Eta" and str(var) != "fatJet3PNetXbb" and str(var) != "met" and str(var) != "ProbHHH" and str(var) != "ProbQCD" and str(var) != "ProbTT" and str(var) != "ProbVJets" and str(var) != "ProbVV" :
+    if str(var) != "ProbHHH" and str(var) != "h1_t3_mass"  :
         continue
+    # if str(var) != "h1_t3_mass":
+    #     continue
+
     canvas = ROOT.TCanvas()
     canvas.SetCanvasSize(600, 700)
     #c.SetBorderMode(0)
@@ -107,28 +102,20 @@ for var in variables:
         print("Skip drawing %s, if you want to draw add the binning option in utils" % var)
         continue
 
-    # template = ROOT.TH1F("", "", histograms_dict[var]["nbins"], histograms_dict[var]["xmin"], histograms_dict[var]["xmax"])
-    # template = ROOT.TH1F("", "", histograms_dict[var]["nbins"],array('d', define_bins) )
+    template = ROOT.TH1F("", "", histograms_dict[var]["nbins"], histograms_dict[var]["xmin"], histograms_dict[var]["xmax"])
     nbins = histograms_dict[var]["nbins"]
     xmin = histograms_dict[var]["xmin"]
     xmax = histograms_dict[var]["xmax"]
-    # define_bins = histograms_dict[var]["define_bins"]
     char_var = var.c_str()
-    # template = ROOT.TH1F("", "", len(define_bins) - 1, array('d', define_bins))
-    template = ROOT.TH1F(char_var,char_var,nbins,0,nbins)
-
-
-
     #file_data = ROOT.TFile(input_folder + '/' + 'histograms_%s.root'%(datahist))
     #file_signal = ROOT.TFile(input_folder + '/' + 'histograms_%s.root'%('GluGluToHHHTo6B_SM'))
 
     files_bkg = {}
-    # for bkg in ['DYJetsToLL','GluGluToHHTo2B2Tau','ZZZ','WWW','WZZ','ZZTo4Q', 'WWTo4Q', 'WWTo4Q','ZJetsToQQ', 'WJetsToQQ', 'TTToHadronic','TTToSemiLeptonic','QCD','QCD_bEnriched','QCD_datadriven_data']:
-    # for bkg in ['DYJetsToLL','GluGluToHHTo2B2Tau','ZZZ','WWW','WZZ','ZZTo4Q', 'WWTo4Q', 'WWTo4Q','ZJetsToQQ', 'WJetsToQQ', 'TTToHadronic','TTToSemiLeptonic','QCD','QCD_bEnriched']:
-    # for bkg in ['DYJetsToLL','GluGluToHHTo2B2Tau','ZZZ','WWW','WZZ','ZZTo4Q', 'WWTo4Q', 'WWTo4Q','ZJetsToQQ', 'WJetsToQQ', 'TTToHadronic','TTToSemiLeptonic','QCD']:
-    # for bkg in ['GluGluToHHTo2B2Tau','QCD_datadriven_data',"GluGluToHHHTo4B2Tau_SM"]:
-    for bkg in ['GluGluToHHTo2B2Tau','QCD_datadriven_data',"GluGluToHHHTo4B2Tau_SM"]:
-    # for bkg in ['DYJetsToLL','GluGluToHHTo2B2Tau','ZZZ','WWW','WZZ','ZZTo4Q', 'WWTo4Q', 'WWTo4Q','ZJetsToQQ', 'WJetsToQQ', 'TTToHadronic','TTToSemiLeptonic','QCD_modelling']:
+
+    # for bkg in ['ZZZ','WWW','WZZ','TTToSemiLeptonic']:
+    # procstodo = ["DYJetsToLL","GluGluToHHHTo4B2Tau_SM","GluGluToHHTo2B2Tau","GluGluToHHTo4B_cHHH0","TTToSemiLeptonic","WJetsToLNu_0J","WJetsToLNu_1J","WJetsToLNu_2J", "ZZTo4Q", "WWTo4Q", "ZJetsToQQ", "WJetsToQQ", "TTToHadronic","TTTo2L2Nu", "QCD", "data_obs" , "GluGluToHHHTo6B_SM"]
+
+    for bkg in ["DYJetsToLL","GluGluToHHHTo4B2Tau_SM","GluGluToHHTo2B2Tau","GluGluToHHTo4B_cHHH0","TTToSemiLeptonic","WJetsToLNu_0J","WJetsToLNu_1J","WJetsToLNu_2J", "ZZTo4Q", "WWTo4Q", "ZJetsToQQ", "WJetsToQQ", "TTToHadronic","TTTo2L2Nu", "QCD" ]:
         #f_tmp = ROOT.TFile(input_folder + '/' + 'histograms_%s.root'%bkg)
         f_tmp = "{}/{}.root".format(input_folder, bkg)
         if os.path.exists(f_tmp) :
@@ -139,25 +126,9 @@ for var in variables:
 
     #h_data = template.Clone()
     #h_data = chunk_data.Fill(template, [char_var])
-
     h_data = chunk_data.Histo1D((char_var,char_var,nbins,xmin,xmax),char_var)
-    # h_data_tmp = chunk_data.Histo1D((char_var,char_var,nbins,array('d',define_bins)),char_var)
-    # h_data = ROOT.TH1F(char_var,char_var,nbins,0,nbins)
-
-    # for i in range(1, h_data.GetNbinsX()+1):
-    #     data_tmp = h_data_tmp.GetBinContent(i)
-    #     e_data_tmp = h_data_tmp.GetBinError(i)
-    #     h_data.SetBinContent(i, data_tmp)
-    #     h_data.SetBinError(i, e_data_tmp)
-    # data_value = h_data.Integral()
-    # print("already get the data value !!!!!!!!!!!!!")
-    
-
-                    
-    # x_aixs = h_data.GetXaxis()
-    # x_aixs.SetNdivisions(505) 
     h_data.Draw()
-    # h_data = h_data.GetValue()
+    h_data = h_data.GetValue()
     h_data.SetTitle(hist_properties[datahist][3])
     h_data.SetName(hist_properties[datahist][3])
     #h_data = file_data.Get(var)
@@ -169,9 +140,7 @@ for var in variables:
     h_data.GetXaxis().SetTitle(histograms_dict[var]["label"])
     h_data.SetTitle('')
     legend.AddEntry( h_data, h_data.GetName())
-    print("data how much !!!!!!!!")
-    print(h_data.Integral())
-    data_value = h_data.Integral()
+
     if do_log :
         ymax      = 1000000.0*h_data.GetMaximum()
     else :
@@ -185,74 +154,29 @@ for var in variables:
             h_data.SetBinError(bin_m,-100000.0)
 
     if 'bdt' in str(var) or 'mva' in str(var):
-        blind_bdt = [x*0.01 + 0.5 for x in range(20)]
+        blind_bdt = [x*0.05 + 0.5 for x in range(20)]
         for value in blind_bdt:
             bin_blind = h_data.FindBin(value)
             h_data.SetBinContent(bin_blind,-3.0000001)
             h_data.SetBinError(bin_blind,0)
 
-    if 'ProbHHH' in str(var) or 'ProbMultiH' in str(var):
-        # blind_bdt = [x*0.001 + 0.97 for x in range(1000)]
-        blind_bdt = [x*0.001 + nbins*0.7 for x in range(3000)]
-        for value in blind_bdt:
-            bin_blind = h_data.FindBin(value)
-            h_data.SetBinContent(bin_blind,-10000.0000001)
-            h_data.SetBinError(bin_blind,0)
-
-
-
     #h_signal = template.Clone()
     #h_signal = chunk_signal.Fill(template, [char_var, 'totalWeight'])
-
     h_signal = chunk_signal.Histo1D((char_var,char_var,nbins,xmin,xmax),char_var, 'totalWeight')
-    # h_signal_tmp = chunk_signal.Histo1D((char_var,char_var,nbins,array('d',define_bins)),char_var, 'totalWeight')
-    # h_signal = ROOT.TH1F(char_var,char_var,nbins,0,nbins)
-
-    # for i in range(1, h_signal.GetNbinsX()+1):
-    #     signal_tmp = h_signal_tmp.GetBinContent(i)
-    #     e_signal_tmp = h_signal_tmp.GetBinError(i)
-    #     h_signal.SetBinContent(i, signal_tmp)
-    #     h_signal.SetBinError(i, e_signal_tmp)
     h_signal.Draw()
-    # h_signal = h_signal.GetValue()
-
-    h_signal2 = chunk_signal2.Histo1D((char_var,char_var,nbins,xmin,xmax),char_var, 'totalWeight')
-    # h_signal2_tmp = chunk_signal2.Histo1D((char_var,char_var,nbins,array('d',define_bins)),char_var, 'totalWeight')
-    # h_signal2 = ROOT.TH1F(char_var,char_var,nbins,0,nbins)
-
-    # for i in range(1, h_signal2.GetNbinsX()+1):
-    #     signal2_tmp = h_signal2_tmp.GetBinContent(i)
-    #     e_signal2_tmp = h_signal2_tmp.GetBinError(i)
-    #     h_signal2.SetBinContent(i, signal2_tmp)
-    #     h_signal2.SetBinError(i, e_signal2_tmp)
-    h_signal2.Draw()
-    # h_signal2 = h_signal2.GetValue()
+    h_signal = h_signal.GetValue()
     #h_signal = file_signal.Get(var)
     h_signal.SetDirectory(0)
     h_signal.SetMarkerColor(hist_properties[signalhist][0])
     h_signal.SetLineColor(hist_properties[signalhist][0])
     h_signal.SetMarkerSize(hist_properties[signalhist][1])
     h_signal.SetLineWidth(hist_properties[signalhist][2])
-
-    h_signal2.SetMarkerColor(hist_properties[signalhist2][0])
-    h_signal2.SetLineColor(hist_properties[signalhist2][0])
-    h_signal2.SetMarkerSize(hist_properties[signalhist2][1])
-    h_signal2.SetLineWidth(hist_properties[signalhist2][2])
-
-
     h_signal.Scale(scale_sig)
-    h_signal2.Scale(scale_sig2)
-
     label_sig = hist_properties[signalhist][3]
     if not scale_sig == 1.0 :
         label_sig =  "%s (X %s)" % (label_sig, str(scale_sig))
-
-    label_sig2 = hist_properties[signalhist2][3]
-    if not scale_sig2 == 1.0 :
-        label_sig2 =  "%s (X %s)" % (label_sig2, str(scale_sig2))
     #legend.AddEntry(h_signal, label_sig, 'l')
     legend.AddEntry(h_signal, label_sig, 'l')
-    legend.AddEntry(h_signal2, label_sig2, 'l')
 
     h_stack = ROOT.THStack()
 
@@ -264,8 +188,6 @@ for var in variables:
     histograms_bkg = {} # need to save histograms outside of for loop other wise seg fault
 
     for bkg in files_bkg:
-        print("now thw bkg is !!!!!!!!!!!!!!!!!!!!!!!")
-        print(bkg)
 
         f_tmp = ROOT.TFile(files_bkg[bkg])
         if 'Events' not in f_tmp.GetListOfKeys():
@@ -276,24 +198,8 @@ for var in variables:
         print(inputTree, files_bkg[bkg])
         #h_tmp       = chunk_bkg.Fill(template, [char_var, 'totalWeight'])
         h_tmp = chunk_bkg.Histo1D((char_var,char_var,nbins,xmin,xmax),char_var, 'totalWeight')
-        # h_tmp2 = chunk_bkg.Histo1D((char_var,char_var,nbins,array('d',define_bins)),char_var, 'totalWeight')
-        # h_tmp = ROOT.TH1F(char_var,char_var,nbins,0,nbins)
-
-        # for i in range(1, h_tmp.GetNbinsX()+1):
-        #     bkg_tmp = h_tmp2.GetBinContent(i)
-        #     e_bkg_tmp = h_tmp2.GetBinError(i)
-        #     h_tmp.SetBinContent(i, bkg_tmp)
-        #     h_tmp.SetBinError(i, e_bkg_tmp)
-        if bkg == 'QCD_datadriven_data':
-            print(h_data.Integral())
-            print(h_tmp.Integral())
-            h_tmp.Scale(data_value/h_tmp.Integral())
-            print("already scale")
-            print(h_data.Integral())
-            print(h_tmp.Integral())
-        # h_tmp = h_tmp.GetValue()
-        print(bkg)
-        histograms_bkg[bkg] = h_tmp
+        h_tmp = h_tmp.GetValue()
+        histograms_bkg[bkg ] = h_tmp
 
         try:
             h_tmp.SetDirectory(0)
@@ -347,12 +253,12 @@ for var in variables:
     p1.Draw()
     p2.Draw()
     print("setting pads")
-    p1.SetBottomMargin(0.3)
-    p1.SetTopMargin(0.05)
-    p1.SetRightMargin(0.05)
-    p2.SetTopMargin(0.05)
-    p2.SetBottomMargin(0.02)
-    p2.SetRightMargin(0.05)
+    # p1.SetBottomMargin(0.3)
+    # p1.SetTopMargin(0.05)
+    # p1.SetRightMargin(0.05)
+    # p2.SetTopMargin(0.05)
+    # p2.SetBottomMargin(0.02)
+    # p2.SetRightMargin(0.05)
 
     h_data.SetMinimum(0.0001)
     h_data.SetMaximum(ymax)
@@ -366,7 +272,6 @@ for var in variables:
     h_data.Draw('e')
     h_stack.Draw('hist e same')
     h_signal.Draw('hist e same')
-    h_signal2.Draw('hist e same')
     h_data.Draw('e same')
     legend.Draw()
 
@@ -395,3 +300,4 @@ for var in variables:
     canvas.Print("%s%s" % (plot_file, '.png'))
 
     print("did %s" % plot_file)
+

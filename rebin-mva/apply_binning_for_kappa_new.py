@@ -1,6 +1,7 @@
 import os, ROOT,glob
 
 import ctypes
+from utils import histograms_dict, wps_years, wps, tags, luminosities, hlt_paths, triggersCorrections, hist_properties, init_mhhh, addMHHH, clean_variables, initialise_df, save_variables, init_get_max_prob, init_get_max_cat
 
 # Test : nAK4 >= 6 and nprobejets >= 2 [1.0, 0.9971, 0.9944, 0.9904, 0.9831, 0.9695, 0.9458] 
 # nAK4 < 6 nprobejets >= 2: [1.0, 0.9969, 0.9938, 0.9876, 0.9741, 0.9394, 0.8229]
@@ -12,10 +13,10 @@ ROOT.gROOT.SetBatch(ROOT.kTRUE)
 
 import argparse
 parser = argparse.ArgumentParser(description='Args')
-parser.add_argument('-v','--version', default='v33_new')
+parser.add_argument('-v','--version', default='v33')
 parser.add_argument('--year', default='2018')
-parser.add_argument('--prob', default='ProbHHH6b')
 parser.add_argument('--path_year', default='2018')
+parser.add_argument('--prob', default='ProbHHH6b')
 parser.add_argument('--var', default = 'ProbMultiH')
 parser.add_argument('--doSyst', action = 'store_true')
 args = parser.parse_args()
@@ -611,211 +612,132 @@ def get_integral_and_error(hist):
     return integral, error.value
 
 
-#path = '/isilon/data/users/mstamenk/eos-triple-h/v28-categorisation/mva-inputs-2018-categorisation-spanet-boosted-classification/'
-path = '/eos/user/x/xgeng/workspace/HHH/CMSSW_12_5_2/src/hhh-analysis-framework/output/%s/sample_cut/%s'%(version,path_year)
 
-cat = 'ProbHH4b_1bh1h_inclusive'
+
+#path = '/isilon/data/users/mstamenk/eos-triple-h/v28-categorisation/mva-inputs-2018-categorisation-spanet-boosted-classification/'
+# path = '/isilon/data/users/mstamenk/eos-triple-h/%s/mva-inputs-%s-categorisation-spanet-boosted-classification/'%(version,year)
+path = '/eos/user/x/xgeng/workspace/HHH/CMSSW_12_5_2/src/hhh-analysis-framework/output/%s/%s'%(version,path_year)
+# cat = 'ProbHHH6b_1Higgs_inclusive'
 option = '_CR'
 
 prob = args.prob#'ProbHHH6b'
 
+# varibles_list=['h1_t3_mass', 'h2_t3_mass', 'h3_t3_mass', 'h_fit_mass', 'h1_t3_pt', 'h2_t3_pt', 'h3_t3_pt', 'h1_t3_eta', 'h2_t3_eta', 'h3_t3_eta', 'h1_t3_phi', 'h2_t3_phi', 'h3_t3_phi', 'h1_t3_dRjets', 'h2_t3_dRjets', 'h3_t3_dRjets', 'h1_t3_match', 'h2_t3_match', 'h3_t3_match',  'fatJet1Mass', 'fatJet2Mass', 'fatJet3Mass', 'fatJet1Pt', 'fatJet2Pt', 'fatJet3Pt', 'fatJet1Eta', 'fatJet2Eta', 'fatJet3Eta', 'fatJet1Phi', 'fatJet2Phi', 'fatJet3Phi', 'fatJet1PNetXbb', 'fatJet2PNetXbb', 'fatJet3PNetXbb', 'fatJet1PNetXjj', 'fatJet2PNetXjj', 'fatJet3PNetXjj', 'fatJet1PNetQCD', 'fatJet2PNetQCD', 'fatJet3PNetQCD', 'HHH_mass', 'HHH_pt', 'HHH_eta', 'nprobejets', 'nbtags', 'nloosebtags', 'nmediumbtags', 'ntightbtags', 'nsmalljets', 'nfatjets', 'ht', 'met', 'bdt', 'ProbHHH', 'ProbHH4b', 'ProbHHH4b2tau', 'ProbMultiH', 'ProbVV', 'ProbQCD', 'ProbTT', 'ProbVJets', 'ProbHH2b2tau', 'Prob3bh0h', 'Prob2bh1h', 'Prob1bh2h', 'Prob0bh3h', 'Prob2bh0h', 'Prob1bh1h', 'Prob0bh2h', 'Prob1bh0h', 'Prob0bh1h', 'Prob0bh0h', 'jet1DeepFlavB', 'jet2DeepFlavB', 'jet3DeepFlavB', 'jet4DeepFlavB', 'jet5DeepFlavB', 'jet6DeepFlavB', 'jet7DeepFlavB', 'jet8DeepFlavB', 'jet9DeepFlavB', 'jet10DeepFlavB',  'jet1Pt', 'jet2Pt', 'jet3Pt', 'jet4Pt', 'jet5Pt', 'jet6Pt', 'jet7Pt', 'jet8Pt', 'jet9Pt', 'jet10Pt', 'jet1Eta', 'jet2Eta', 'jet3Eta', 'jet4Eta', 'jet5Eta', 'jet6Eta', 'jet7Eta', 'jet8Eta', 'jet9Eta', 'jet10Eta', 'nsmalljets', 'nfatjets']
+varibles_list=['ProbMultiH']
 
 
-# for cat in ['%s_3bh0h_inclusive','%s_2bh1h_inclusive','%s_1bh2h_inclusive','%s_0bh3h_inclusive']:
-
-for cat in ['%s_2bh0h_inclusive','%s_1bh1h_inclusive','%s_0bh2h_inclusive','%s_0bh0h_inclusive','%s_2Higgs_inclusive','%s_1Higgs_inclusive','%s_3Higgs_inclusive','%s_3bh0h_inclusive','%s_2bh1h_inclusive','%s_1bh2h_inclusive','%s_0bh3h_inclusive']:# variables:
-# for cat in ['%s_3bh0h_inclusive','%s_2bh1h_inclusive','%s_1bh2h_inclusive','%s_0bh3h_inclusive','%s_2bh0h_inclusive','%s_1bh1h_inclusive','%s_0bh2h_inclusive','%s_1bh0h_inclusive','%s_0bh1h_inclusive','%s_0bh0h_inclusive','%s_2Higgs_inclusive','%s_1Higgs_inclusive','%s_3Higgs_inclusive']:# variables:
-#for cat in ['%s_2bh0h_inclusive','%s_1bh1h_inclusive','%s_0bh2h_inclusive','%s_1bh0h_inclusive','%s_0bh1h_inclusive','%s_0bh0h_inclusive','%s_2Higgs_inclusive','%s_1Higgs_inclusive','%s_3Higgs_inclusive']:# variables:
+for cat in ['%s_0bh0h_inclusive','%s_2Higgs_inclusive','%s_1Higgs_inclusive','%s_3Higgs_inclusive','%s_3bh0h_inclusive','%s_2bh1h_inclusive','%s_1bh2h_inclusive','%s_0bh3h_inclusive']:# variables:
+# for cat in ['%s_1bh2h_inclusive','%s_0bh3h_inclusive']:# variables:
+# for cat in ['%s_0bh0h_inclusive']:# variables:
     cat = cat%prob
     print(cat)
     #print(binnings[cat])
-    target = '%s%s/histograms'%(cat,option)
+    target = '%s%s/histograms/kappa'%(cat,option)
 
     if not os.path.isdir(path + '/' + target):
         os.makedirs(path+'/'+target)
 
     file_path = '%s'%cat + option +'/'
 
-    samples = glob.glob(path+'/'+file_path+'/*.root')
-    samples = [os.path.basename(s).replace('.root','') for s in samples]
+    # samples = glob.glob(path+'/'+file_path+'/*.root')
+    # samples = [os.path.basename(s).replace('.root','') for s in samples if 'QCD' not in s]
+    # samples=["GluGluToHHTo4B_cHHH1","GluGluToHHTo4B_cHHH0","GluGluToHHTo4B_cHHH5","data_obs","GluGluToHHHTo6B_SM","GluGluToHHHTo4B2Tau_SM","GluGluToHHTo2B2Tau_SM","QCD_datadriven"]
+    samples = ['HHHTo6B_c3_0_d4_99','HHHTo6B_c3_0_d4_minus1','HHHTo6B_c3_19_d4_19','HHHTo6B_c3_1_d4_0','HHHTo6B_c3_1_d4_2','HHHTo6B_c3_2_d4_minus1','HHHTo6B_c3_4_d4_9','HHHTo6B_c3_minus1_d4_0','HHHTo6B_c3_minus1_d4_minus1','HHHTo6B_c3_minus1p5_d4_minus0p5']
 
-    #var = "ProbMultiH" #variables[cat]
-    outfile = ROOT.TFile(path +'/' + target + '/' + 'histograms_%s.root'%var,'recreate')
+    # samples=["data_obs","QCD_datadriven_data"]
 
     #samples = ['GluGluToHHHTo6B_SM']
 
-    
+    var_HHH = "ProbMultiH" #variables[cat]
 
     binning = binnings[cat]
     cut = categories[cat]
-    # print("binning is aaaaaaaaaaaaahjbjkrgvnrkjvrjierjirjirjrvjvrkrkvmvmvlvmlkmvmvlvvlv")
-    # print(binning)
-    # break
 
-    data_yield = 0
-    bkg_yield = 0
+    data_yield = {}
+    bkg_yield = {}
 
     for s in samples:
-        if 'GluGlu' in s: continue # separate signal from other processes
-        if 'QCD' in s: continue
+        outfile = ROOT.TFile(path +'/' + target + '/' + 'histograms_%s.root'%(s),'recreate')
         print(s)
         f_name = path + '/' + file_path + '/' + s + '.root'
         tree = ROOT.TChain('Events')
         tree.AddFile(f_name)
-
-        if 'JetHT' in s:
-            h_mva = ROOT.TH1F('data_obs','data_obs',len(binning),0,len(binning))
-        else:
-            h_mva = ROOT.TH1F(s,s,len(binning),0,len(binning))
-
-        weight = 'totalWeight'
-
         
-
-        
-        #    weight = 'totalWeight / (flavTagWeight * fatJetFlavTagWeight)'
-
-        for i in range(1,h_mva.GetNbinsX() + 1):
-
-            low,up = binning[i]
-        
-            h_name = s + '_histo_%d'%i
-
-            
-
-            tree.Draw("%s>>%s(100,0,1)"%(var,h_name),'(%s && %s > %f && %s < %f) * %s'%(cut, var,low, var,up,weight))
-            try:
-                h = ROOT.gPad.GetPrimitive(h_name)
-                integral, error = get_integral_and_error(h)
-            except: continue
-            
-            print(i,integral,error)
-            h_mva.SetBinContent(i,integral)
-            h_mva.SetBinError(i,error)
-        if 'data_obs' in s:
-            data_yield = h_mva.Integral() 
-        if 'data_obs' not in s:
-            bkg_yield += h_mva.Integral()   
-
-        
-        #h_mva.Rebin(2)
-        #if 'data_obs' not in s:
-        #if 'QCD' in s:
-        #    h_mva.Scale(0.47)
-        outfile.cd()
-        h_mva.Write()
-
-
-    for sam in samples:
-        if 'GluGlu' not in sam: continue # separate signal from other processes
-
-        for syst in systematics:
-            if 'nominal' in syst:
-                s = sam 
-                if 'JMRUP' in sam:
-                    s = sam.replace('JMRUP','') + '_JMR_Up'
-                elif 'JMRDOWN' in sam:
-                    s = sam.replace('JMRDOWN','') + '_JMR_Down'
-
-                if 'JESUP' in sam:
-                    s = sam.replace('JESUP','') + '_JES_Up'
-                elif 'JESDOWN' in sam:
-                    s = sam.replace('JESDOWN','') + '_JES_Down'
-
-                if 'JERUP' in sam:
-                    s = sam.replace('JERUP','') + '_JER_Up'
-                elif 'JERDOWN' in sam:
-                    s = sam.replace('JERDOWN','') + '_JER_Down'
-
-            else:
-                s = sam + '_' + labels[syst]
-                if 'JMR' in sam or 'JES' in sam or 'JER' in sam: continue
-            print(s)
-
-
-            f_name = path + '/' + file_path + '/' + sam + '.root'
-            tree = ROOT.TChain('Events')
-            tree.AddFile(f_name)
-
-            if 'JetHT' in s:
-                h_mva = ROOT.TH1F('data_obs','data_obs',len(binning),0,len(binning))
-            else:
-                h_mva = ROOT.TH1F(s,s,len(binning),0,len(binning))
-
-            if 'nominal' in syst:
-                weight = 'totalWeight'
-            elif 'LHE' in syst or 'PSWeight' in syst:
-                weight = 'totalWeight * %s'%syst
-
-            elif 'flavTag' in syst or 'FlavTag' in syst:
-                w = syst.split('_')[0]
-                weight = '(totalWeight / %s) * %s'%(w,syst)
-
-            
-            #    weight = 'totalWeight / (flavTagWeight * fatJetFlavTagWeight)'
-
-            for i in range(1,h_mva.GetNbinsX() + 1):
-
-                low,up = binning[i]
-            
-                h_name = sam + '_histo_%d_%s'%(i,labels[syst])
-
-                
-
-                tree.Draw("%s>>%s(100,0,1)"%(var,h_name),'(%s && %s > %f && %s < %f) * %s'%(cut, var,low, var,up,weight))
-                try:
-                    h = ROOT.gPad.GetPrimitive(h_name)
-                    integral, error = get_integral_and_error(h)
-                except: continue
-                
-                print(i,integral,error)
-                h_mva.SetBinContent(i,integral)
-                h_mva.SetBinError(i,error)
-            if 'data_obs' in s:
-                data_yield = h_mva.Integral() 
-            if 'data_obs' not in s:
-                bkg_yield += h_mva.Integral()   
-
-            
-            #h_mva.Rebin(2)
-            #if 'data_obs' not in s:
-            #if 'QCD' in s:
-            #    h_mva.Scale(0.47)
-            outfile.cd()
-            h_mva.Write()
-
-    tree = ROOT.TChain('Events')
-    #tree.AddFile(path + '/' + file_path + '/' + 'QCD' + '.root')
-    #tree.AddFile(path + '/' + file_path + '/' + 'QCD_modelling' + '.root')
-    tree.AddFile(path + '/' + file_path + '/' + 'QCD_datadriven' + '.root')
-
-    h_mva = ROOT.TH1F('QCD','QCD',len(binning),0,len(binning))
-    print('QCD')
-    for i in range(1,h_mva.GetNbinsX() + 1):
-
-        low,up = binning[i]
-
-        h_name = 'QCD' + '_histo_%d'%i
-        tree.Draw("%s>>%s(100,0,1)"%(var,h_name),'(%s && %s > %f && %s < %f) * totalWeight'%(cut, var,low, var,up))
+        chunk_df = ROOT.RDataFrame('Events', f_name)
         try:
-            h = ROOT.gPad.GetPrimitive(h_name)
-            integral, error = get_integral_and_error(h)
-        except: continue
+            entries_no_filter = int(chunk_df.Count().GetValue())
+        except:
+            continue
+        variables = chunk_df.GetColumnNames()
+        # print(variables)
         
-        print(i,integral,error)
-        h_mva.SetBinContent(i,integral)
-        h_mva.SetBinError(i,error)
+        
+
+        for var in varibles_list:
+            
+            # var = var.c_str()
+            
+            if var == 'ProbMultiH':
+                h_mva = ROOT.TH1F(var,var,len(binning),0,len(binning))
+                
+                for i in range(1,h_mva.GetNbinsX() + 1):
+
+                    low,up = binning[i]
+                
+                    h_name = s + '_histo_%d'%i
+                    tree.Draw("%s>>%s(100,0,1)"%(var,h_name),'(%s && %s > %f && %s < %f) * totalWeight'%(cut, var,low, var,up))
+                    try:
+                        h = ROOT.gPad.GetPrimitive(h_name)
+                        integral, error = get_integral_and_error(h)
+                    except: continue
+                    # print("value equals:")
+                    # print(i,integral,error)
+                    h_mva.SetBinContent(i,integral)
+                    h_mva.SetBinError(i,error)
+                if 'data_obs' in s:
+                    data_yield[var] = h_mva.Integral() 
+                
+                if 'QCD_datadriven' in s:
+                    h_mva.Scale(float((data_yield[var])) / h_mva.Integral())
+                    # print("new!")
+                    # print(data_yield[var], h_mva.Integral())
+
+                
+                outfile.cd()
+                h_mva.Write()
+            
+            else:
+               
+                # print(var)
+                
+                nbins = histograms_dict[var]["nbins"]
+                xmin = histograms_dict[var]["xmin"]
+                xmax = histograms_dict[var]["xmax"]   
+                # chunk_df = ROOT.RDataFrame('Events', f_name)
+                h_tmp = chunk_df.Filter("%s > %s"%(var,xmin)).Histo1D((var,var,nbins,xmin,xmax),var, 'totalWeight')
+
+                
+                
+                if s == "data_obs":
+                    data_yield[var] = h_tmp.Integral()
+                    # print("already get the data value !!!!!!!!!!!!!")
+                    # print(h_tmp.Integral())
+
+                if s == "QCD_datadriven_data":
+                    if h_tmp.Integral() > 0.0 :
+                        # print(h_tmp.Integral())
+                        h_tmp.Scale(data_yield[var]/h_tmp.Integral())
+                        # print("already scale the QCD !!!!!!!!!!!!!")
+                        print(data_yield[var], h_tmp.Integral())
+
+                h_tmp.SetTitle('%s'%(var))
+                h_tmp.SetName('%s'%(var))
+                h_tmp.Write()
 
 
-    print(data_yield,bkg_yield, h_mva.Integral())
-    #h_mva.Scale(float((data_yield-bkg_yield)) / h_mva.Integral())
-    if h_mva.Integral() > 0:
-        h_mva.Scale(float((data_yield)) / h_mva.Integral())
+        outfile.Close()
 
-    h_mva.Write()
+        print("Done with:")
+        print(path +'/' + target + '/' + 'histograms_%s.root'%(s))
 
-    outfile.Close()
-
-    print("Done with:")
-    print(path +'/' + target + '/' + 'histograms_%s.root'%var)
 
