@@ -9,3 +9,4 @@ plots_addmva/*
 shape_unc/*.pdf
 v26_2018_nAK8_0_passLoose_inclusive_inclusive/
 bdt-framework/*
+*.root
